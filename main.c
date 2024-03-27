@@ -18,5 +18,7 @@ int main(int argc, char *argv[])
 
   cluster_generateResult(argv[2]);
 
+  cluster_destroy(cluster);
+
   return 0;
 }
