@@ -15,6 +15,40 @@ typedef struct point *Point;
 Point point_init(int m, int idInitialLength);
 
 /**
+ * Gets the identifier of a point.
+ *
+ * @param point The point.
+ * @return The identifier of the point.
+ */
+char *point_getId(Point point);
+
+/**
+ * Gets the coordinate of a point.
+ *
+ * @param point The point.
+ * @param i The index of the coordinate.
+ * @return The coordinate of the point.
+ */
+double point_getCoord(Point point, int i);
+
+/**
+ * Sets the identifier of a point.
+ *
+ * @param point The point.
+ * @param id The identifier of the point.
+ */
+void point_setId(Point point, char *id);
+
+/**
+ * Sets the coordinate of a point.
+ *
+ * @param point The point.
+ * @param i The index of the coordinate.
+ * @param coord The coordinate of the point.
+ */
+void point_setCoord(Point point, int i, double coord);
+
+/**
  * Destroys a point.
  *
  * Uses free() from stdlib to deallocate memory used by the point.
