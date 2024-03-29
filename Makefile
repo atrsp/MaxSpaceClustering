@@ -1,5 +1,18 @@
-all:
-	gcc -o main main.c Cluster.c Point.c
+FLAGS = -g -c -Wall
+COMPILED = compiled
+
+all: main.c tads/Cluster.c tads/Cluster.h tads/Point.c tads/Point.h
+	@gcc $(FLAGS) main.c -o $(COMPILED)/main.o
+	@gcc $(FLAGS) tads/Cluster.c -o $(COMPILED)/Cluster.o
+	@gcc $(FLAGS) tads/Point.c -o $(COMPILED)/Point.o
+	@gcc -o main $(COMPILED)/main.o $(COMPILED)/Cluster.o $(COMPILED)/Point.o
+
+run:
+	./main in-exemplos/1.txt
+
+valgrind:
+	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/1.txt
 
 clean:
-	rm main
+	@rm -f $(COMPILED)/*.o
+	@rm main
