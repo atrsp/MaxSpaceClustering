@@ -2,6 +2,7 @@ FLAGS = -g -c -Wall
 COMPILED = compiled
 
 all: main.c tads/Cluster.c tads/Cluster.h tads/Point.c tads/Point.h
+	@mkdir -p $(COMPILED)
 	@gcc $(FLAGS) main.c -o $(COMPILED)/main.o
 	@gcc $(FLAGS) tads/Cluster.c -o $(COMPILED)/Cluster.o
 	@gcc $(FLAGS) tads/Point.c -o $(COMPILED)/Point.o
@@ -15,4 +16,5 @@ valgrind:
 
 clean:
 	@rm -f $(COMPILED)/*.o
-	@rm main
+	@rm -rf $(COMPILED)
+	@rm -f main
