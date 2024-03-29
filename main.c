@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "Cluster.h"
+#include "tads/Cluster.h"
 
 int main(int argc, char *argv[])
 {
