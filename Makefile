@@ -7,7 +7,7 @@ all: main.c tads/Cluster.c tads/Cluster.h tads/Point.c tads/Point.h tads/Distanc
 	@gcc $(FLAGS) tads/Cluster.c -o $(COMPILED)/Cluster.o
 	@gcc $(FLAGS) tads/Point.c -o $(COMPILED)/Point.o
 	@gcc $(FLAGS) tads/Distance.c -o $(COMPILED)/Distance.o
-	@gcc -o main $(COMPILED)/main.o $(COMPILED)/Cluster.o $(COMPILED)/Point.o $(COMPILED)/Distance.o
+	@gcc -o main $(COMPILED)/main.o $(COMPILED)/Cluster.o $(COMPILED)/Point.o $(COMPILED)/Distance.o -lm
 
 run:
 	./main in-exemplos/1.txt

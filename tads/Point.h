@@ -49,6 +49,16 @@ void point_setId(Point point, char *id);
 void point_setCoord(Point point, int i, double coord);
 
 /**
+ * Calculates the Euclidian Distance between two points.
+ *
+ * @param pA First point.
+ * @param pB Second point.
+ * @param dimension The dimension from the points.
+ * @return The calculated Euclidian Distance.
+ */
+double point_euclidianDistance (Point pA, Point pB, int dimension);
+
+/**
  * Destroys a point.
  *
  * Uses free() from stdlib to deallocate memory used by the point.

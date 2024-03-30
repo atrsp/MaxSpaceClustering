@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 
   cluster_read(cluster, argv[1]);
 
-  // cluster_calcDistances();
+  cluster_calcDistances(cluster);
 
   // cluster_orderDistances();
 
@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 
   // Proves that the points were read correctly
   _cluster_printPoints(cluster);
+  _cluster_printDistances(cluster);
 
   cluster_destroy(cluster);
 

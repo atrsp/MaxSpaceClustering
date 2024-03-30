@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 struct point
 {
@@ -35,6 +36,18 @@ void point_setId(Point point, char *id)
 void point_setCoord(Point point, int i, double coord)
 {
   point->coords[i] = coord;
+}
+
+double point_euclidianDistance (Point pA, Point pB, int dimension)
+{
+    double distance = 0;
+    double sum = 0;
+    
+    for (int i=0; i < dimension; i++)
+      sum += pow((pA->coords[i] - pB->coords[i]), 2);
+    
+    distance = sqrt(sum);
+    return distance;
 }
 
 void point_destroy(Point point)

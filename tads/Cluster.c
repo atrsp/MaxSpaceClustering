@@ -3,6 +3,7 @@
 #include "Distance.h"
 
 #include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -14,12 +15,13 @@ struct cluster
   Point *points;        // Array of points
   int points_alloc;     // Number of points allocated
   Distance *distances;  // Array of distances
+  int distances_size;   // Size of distances array
 };
 
 Cluster cluster_init()
 {
   Cluster cluster = (Cluster)calloc(1, sizeof(struct cluster));
-  cluster->points_alloc = 24;
+  cluster->points_alloc = 2;
   cluster->points = (Point *)calloc(cluster->points_alloc, sizeof(Point));
 
   return cluster;
@@ -94,20 +96,39 @@ void _cluster_printPoints(Cluster cluster)
   }
 }
 
-void cluster_calcDistances(Cluster cluster) {
-  cluster->distances = distance_init(cluster->n);
+void _cluster_printDistances(Cluster cluster)
+{ 
+  
+  for (int i = 0; i < cluster->distances_size; i++)
+    printf ("%d. DIST (pontos %s e %s): %lf\n", i, distance_getPointId(cluster->distances[i], 1), distance_getPointId(cluster->distances[i], 0), distance_getValue(cluster->distances[i]));
+}
 
-  for (int i = 0; i < distance_getSize(cluster->distances); i++) {
-    
+
+void cluster_calcDistances(Cluster cluster) 
+{
+  cluster->distances_size = (pow(cluster->n, 2) - cluster->n) / 2;   // Size of the lower triangle of a square matrix n sized;
+  cluster->distances = distance_arrayInit(cluster->distances_size);
+
+  int distancesIndex = 0;
+  for (int j = 0; j < cluster->n; j++) 
+  {
+    for (int k = j+1; k < cluster->n; k++) 
+    {
+      double distance = point_euclidianDistance(cluster->points[j], cluster->points[k], cluster->m);
+      cluster->distances[distancesIndex] = distance_set(cluster->points[j], cluster->points[k], distance);
+      distancesIndex++;
+    }
   }
+  
 }
 
 void cluster_destroy(Cluster cluster)
 {
+  distance_destroy(cluster->distances, cluster->distances_size);
+  
   for (int i = 0; i < cluster->n; i++)
-  {
     point_destroy(cluster->points[i]);
-  }
+  
   free(cluster->points);
   free(cluster);
 }
