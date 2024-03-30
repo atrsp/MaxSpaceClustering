@@ -9,6 +9,7 @@ Distance* distance_arrayInit(int arraySize);
 Distance distance_set(Point pA, Point pB, double distance);
 double distance_getValue (Distance d);
 char* distance_getPointId (Distance d, int whichPoint);
+int _distance_compare(const void* a, const void* b);
 void distance_destroy (Distance* d, int size);
 
 #endif

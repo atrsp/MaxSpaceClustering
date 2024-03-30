@@ -1,5 +1,6 @@
 #include "Distance.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 struct distance {
     Point pA;           // pointA
@@ -34,6 +35,16 @@ char* distance_getPointId (Distance d, int whichPoint)
         return point_getId(d->pA);
 
     return point_getId(d->pB);
+}
+
+int _distance_compare(const void *a, const void *b) {
+    const Distance distanceA = *(const Distance*)a;
+    const Distance distanceB = *(const Distance*)b;
+
+    // Compare distances
+    if (distanceA->distance < distanceB->distance) return -1;
+    if (distanceA->distance > distanceB->distance) return 1;
+    return 0; // Distances are equal
 }
 
 void distance_destroy (Distance* d, int size) 
