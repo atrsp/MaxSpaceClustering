@@ -64,13 +64,13 @@ void cluster_read(Cluster cluster, char *filepath)
 
     char *token = strtok(line, ","); // get the point id
     Point point = point_init(cluster->m, strlen(token) + 1);
-    printf("ID: %s\n", token);
+    // printf("ID: %s\n", token);
     point_setId(point, token);
 
     for (int i = 0; i < cluster->m; i++)
     {
       token = strtok(NULL, ",");
-      printf("Coord: %s\n", token);
+      // printf("Coord: %s\n", token);
       point_setCoord(point, i, atof(token));
     }
 
@@ -85,6 +85,10 @@ void cluster_read(Cluster cluster, char *filepath)
 
 void _cluster_printPoints(Cluster cluster)
 {
+  // printf("\nquantity of points (n): %d;\n", cluster->n);
+  // printf("space size (m): %d;\n", cluster->m);
+  // printf("distances array size: %d.\n\n", cluster->distances_size);
+
   for (int i = 0; i < cluster->n; i++)
   {
     printf("Point %d\n", i);
