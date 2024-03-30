@@ -1,5 +1,6 @@
 #include "Cluster.h"
 #include "Point.h"
+#include "Distance.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,11 +8,12 @@
 
 struct cluster
 {
-  int k;            // Number of groups to be formed
-  int m;            // Dimension of the space
-  int n;            // Number of points
-  Point *points;    // Array of points
-  int points_alloc; // Number of points allocated
+  int k;                // Number of groups to be formed
+  int m;                // Dimension of the space
+  int n;                // Number of points
+  Point *points;        // Array of points
+  int points_alloc;     // Number of points allocated
+  Distance *distances;  // Array of distances
 };
 
 Cluster cluster_init()
@@ -89,6 +91,14 @@ void _cluster_printPoints(Cluster cluster)
     {
       printf("Coord %d: %f\n", j, point_getCoord(cluster->points[i], j));
     }
+  }
+}
+
+void cluster_calcDistances(Cluster cluster) {
+  cluster->distances = distance_init(cluster->n);
+
+  for (int i = 0; i < distance_getSize(cluster->distances); i++) {
+    
   }
 }
 
