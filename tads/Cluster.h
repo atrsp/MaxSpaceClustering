@@ -33,10 +33,27 @@ void cluster_read(Cluster cluster, char *filepath);
  */
 void _cluster_printPoints(Cluster cluster);
 
+/**
+ * Prints the distances between points in the cluster.
+ * 
+ * @param cluster The cluster containing the distances to be printed.
+ */
 void _cluster_printDistances(Cluster cluster);
 
+/**
+ * Calculates the distances between points in the cluster and stores them in the cluster's distances array.
+ * 
+ * @param cluster The cluster for which distances are to be calculated.
+ */
 void cluster_calcDistances(Cluster cluster);
+
+/**
+ * Sorts the distances in the cluster's distances array with qsort() function.
+ * 
+ * @param cluster The cluster containing the distances to be sorted.
+ */
 void cluster_sortDistances(Cluster cluster);
+
 void cluster_kruskal();
 void cluster_identifyGroups(int k);
 void cluster_generateResult(char *filename);
