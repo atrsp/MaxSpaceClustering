@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
   cluster_calcDistances(cluster);
 
-  // cluster_orderDistances();
+  cluster_sortDistances(cluster);
 
   // cluster_kruskal();
 

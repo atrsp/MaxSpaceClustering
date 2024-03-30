@@ -122,6 +122,10 @@ void cluster_calcDistances(Cluster cluster)
   
 }
 
+void cluster_sortDistances(Cluster cluster) {
+  qsort(cluster->distances, cluster->distances_size, sizeof(Distance), _distance_compare);
+}
+
 void cluster_destroy(Cluster cluster)
 {
   distance_destroy(cluster->distances, cluster->distances_size);

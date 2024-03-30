@@ -36,7 +36,7 @@ void _cluster_printPoints(Cluster cluster);
 void _cluster_printDistances(Cluster cluster);
 
 void cluster_calcDistances(Cluster cluster);
-void cluster_orderDistances();
+void cluster_sortDistances(Cluster cluster);
 void cluster_kruskal();
 void cluster_identifyGroups(int k);
 void cluster_generateResult(char *filename);
