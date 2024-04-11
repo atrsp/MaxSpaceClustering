@@ -32,15 +32,15 @@ int main(int argc, char *argv[])
   cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
   printf("cluster_sortDistances() time: %.2f seconds\n", cpu_time_used);
 
-  // cluster_kruskal();
+  cluster_kruskal(cluster);
 
   // cluster_identifyGroups(atoi(argv[2]));
 
   // cluster_generateResult(argv[3]);
 
   // Proves that the points were read correctly
-  _cluster_printPoints(cluster);
-  _cluster_printDistances(cluster);
+  // _cluster_printPoints(cluster);
+  // _cluster_printDistances(cluster);
 
   start = clock();
   cluster_destroy(cluster);

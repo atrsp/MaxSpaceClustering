@@ -40,6 +40,16 @@ double point_getCoord(Point point, int i);
 void point_setId(Point point, char *id);
 
 /**
+ * 
+*/
+void point_setSet(Point p, int set);
+
+/**
+ * 
+*/
+int point_getSet(Point p);
+
+/**
  * Sets the coordinate of a point.
  *
  * @param point The point.

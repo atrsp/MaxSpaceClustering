@@ -8,6 +8,7 @@ struct point
 {
   char *id;       // Identifier of the point
   double *coords; // Coordinates of the point
+  int set;        // index of immediate parent
 };
 
 Point point_init(int m, int idInitialLength)
@@ -15,6 +16,8 @@ Point point_init(int m, int idInitialLength)
   Point point = (Point)calloc(1, sizeof(struct point));
   point->id = (char *)calloc(idInitialLength, sizeof(char));
   point->coords = (double *)calloc(m, sizeof(double));
+  point->set = 0;
+
   return point;
 }
 
@@ -31,6 +34,14 @@ double point_getCoord(Point point, int i)
 void point_setId(Point point, char *id)
 {
   strcpy(point->id, id);
+}
+
+void point_setSet(Point p, int set) {
+  p->set = set;
+}
+
+int point_getSet(Point p) {
+  return p->set;
 }
 
 void point_setCoord(Point point, int i, double coord)

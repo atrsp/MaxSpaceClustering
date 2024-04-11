@@ -130,6 +130,57 @@ void cluster_sortDistances(Cluster cluster) {
   qsort(cluster->distances, cluster->distances_size, sizeof(Distance), _distance_compare);
 }
 
+void cluster_kruskal(Cluster cluster) {
+
+  int sz[cluster->n]; // init
+  for (int i = 0; i < cluster->n; i++) { //init
+    point_setSet(cluster->points[i], i);
+    sz[i] = 1;
+  }
+
+  for (int i = 0; i < cluster->distances_size; i++) {
+    Point pA = distance_getPoint(cluster->distances[i], 1);
+    Point pB = distance_getPoint(cluster->distances[i], 0);
+
+    int setA = point_getSet(pA);
+    int setB = point_getSet(pB);
+
+    if (setA != setB) {
+      
+      int j = setA;
+      while(j != point_getSet(cluster->points[j]))
+      {
+        j = point_getSet(cluster->points[j]);
+      }
+      int rootA = j;
+
+
+      int k = setB;
+      while(k != point_getSet(cluster->points[k]))
+      {
+        k = point_getSet(cluster->points[k]);
+      }
+      int rootB = k;
+
+      if (sz[rootA] < sz[rootB]) {
+        point_setSet(cluster->points[rootA], rootB);
+        sz[rootB] += sz[rootA];
+      }
+      else {
+        point_setSet(cluster->points[rootB], rootA);
+        sz[rootA] += sz[rootB];
+      }
+    }
+  }
+
+  printf("\n");
+  for (int i = 0; i < cluster->n; i++) {
+    int set = point_getSet(cluster->points[i]);
+    printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
+  }
+  printf("\n");
+}
+
 void cluster_destroy(Cluster cluster)
 {
   distance_destroy(cluster->distances, cluster->distances_size);

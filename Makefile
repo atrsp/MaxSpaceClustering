@@ -12,8 +12,11 @@ all: main.c tads/Cluster.c tads/Cluster.h tads/Point.c tads/Point.h tads/Distanc
 run:
 	./main in-exemplos/1.txt
 
+run_spec:
+	./main in-exemplos/spec.txt
+
 valgrind:
-	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/1.txt
+	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/spec.txt
 
 clean:
 	@rm -f $(COMPILED)/*.o

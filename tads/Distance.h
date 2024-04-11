@@ -41,6 +41,11 @@ double distance_getValue (Distance d);
 char* distance_getPointId (Distance d, int whichPoint);
 
 /**
+ * 
+*/
+Point distance_getPoint (Distance d, int whichPoint);
+
+/**
  * Comparison function for sorting distances (crescent order).
  *
  * @param a Pointer to the first Distance object.
