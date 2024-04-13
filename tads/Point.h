@@ -40,13 +40,19 @@ double point_getCoord(Point point, int i);
 void point_setId(Point point, char *id);
 
 /**
+ * Sets the index of the set (immediate parent) that the point belongs to.
  * 
-*/
+ * @param p The Point object for which to set the index of the set.
+ * @param set The index of the set that the point belongs to.
+ */
 void point_setSet(Point p, int set);
 
 /**
+ * Retrieves the index of the set (immediate parent) that the point belongs to.
  * 
-*/
+ * @param p The Point object for which to retrieve the index of the set.
+ * @return The index of the set that the point belongs to.
+ */
 int point_getSet(Point p);
 
 /**

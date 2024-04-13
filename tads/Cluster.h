@@ -56,14 +56,46 @@ void cluster_calcDistances(Cluster cluster);
  */
 void cluster_sortDistances(Cluster cluster);
 
+/**
+ * Initializes the sz array and assigns each point to its own set in the cluster.
+ * 
+ * @param cluster The cluster for which the sz array and point sets are initialized.
+ */
 void _MST_init(Cluster cluster);
 
+/**
+ * Checks if two point sets in the cluster are connected.
+ * 
+ * @param cluster The cluster containing the sets.
+ * @param setA The index of the first set.
+ * @param setB The index of the second set.
+ * @return true if setA and setB are connected, false otherwise.
+ */
 bool _MST_isConnected(Cluster cluster, int setA, int setB);
 
+/**
+ * Finds the root of the set containing the specified point.
+ * 
+ * @param cluster The cluster containing the point sets.
+ * @param pointSet The index of the point set to find the root for.
+ * @return The index of the root of the set containing the specified point.
+ */
 int _MST_findRoot(Cluster cluster, int pointSet);
 
+/**
+ * Combines two point sets in the cluster.
+ * 
+ * @param cluster The cluster containing the sets to be combined.
+ * @param setA The index of the first set.
+ * @param setB The index of the second set.
+ */
 void _MST_union(Cluster cluster, int setA, int setB);
 
+/**
+ * Performs Kruskal's algorithm on the cluster to construct a minimum spanning tree.
+ * 
+ * @param cluster The cluster for which Kruskal's algorithm is performed.
+ */
 void cluster_kruskal();
 void cluster_identifyGroups(int k);
 void cluster_generateResult(char *filename);
