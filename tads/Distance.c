@@ -8,10 +8,8 @@ struct distance {
     double distance;    // distance between pA and pB 
 };
 
-enum {
-  PA = 1,
-  PB  = 0
-} whichPoint;
+#define PA 1
+#define PB 0
 
 Distance* distance_arrayInit(int arraySize) {
     Distance* distance = (Distance*)calloc(arraySize, sizeof(Distance));
@@ -44,7 +42,7 @@ char* distance_getPointId (Distance d, int whichPoint)
 
 Point distance_getPoint (Distance d, int whichPoint) 
 {   
-    if (whichPoint)
+    if (whichPoint == PA)
         return d->pA;
 
     return d->pB;

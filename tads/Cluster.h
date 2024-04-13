@@ -1,6 +1,8 @@
 #ifndef CLUSTER_H
 #define CLUSTER_H
 
+#include <stdbool.h>
+
 typedef struct cluster *Cluster;
 
 /**
@@ -53,6 +55,14 @@ void cluster_calcDistances(Cluster cluster);
  * @param cluster The cluster containing the distances to be sorted.
  */
 void cluster_sortDistances(Cluster cluster);
+
+void _MST_init(Cluster cluster);
+
+bool _MST_isConnected(Cluster cluster, int setA, int setB);
+
+int _MST_findRoot(Cluster cluster, int pointSet);
+
+void _MST_union(Cluster cluster, int setA, int setB);
 
 void cluster_kruskal();
 void cluster_identifyGroups(int k);

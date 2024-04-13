@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define PA 1
+#define PB 0
+
 struct cluster
 {
   int k;                // Number of groups to be formed
@@ -16,6 +19,8 @@ struct cluster
   int points_alloc;     // Number of points allocated
   Distance *distances;  // Array of distances
   int distances_size;   // Size of distances array
+
+  int* sz;              // For each item, gives the number of objects in the tree rooted in that item
 };
 
 Cluster cluster_init()
@@ -130,46 +135,55 @@ void cluster_sortDistances(Cluster cluster) {
   qsort(cluster->distances, cluster->distances_size, sizeof(Distance), _distance_compare);
 }
 
-void cluster_kruskal(Cluster cluster) {
+void _MST_init(Cluster cluster) {
+  cluster->sz = (int*)calloc(cluster->n, sizeof(int)); //init
 
-  int sz[cluster->n]; // init
   for (int i = 0; i < cluster->n; i++) { //init
     point_setSet(cluster->points[i], i);
-    sz[i] = 1;
+    cluster->sz[i] = 1;
   }
+}
+
+bool _MST_isConnected(Cluster cluster, int setA, int setB) {
+    return _MST_findRoot(cluster, setA) == _MST_findRoot(cluster, setB);
+}
+
+int _MST_findRoot(Cluster cluster, int pointSet) {
+  while(pointSet != point_getSet(cluster->points[pointSet]))
+  {
+    pointSet = point_getSet(cluster->points[pointSet]);
+  }
+  
+  return pointSet;
+}
+
+void _MST_union(Cluster cluster, int setA, int setB) {
+  int rootA = _MST_findRoot(cluster, setA);
+  int rootB = _MST_findRoot(cluster, setB);
+
+  if (cluster->sz[rootA] < cluster->sz[rootB]) {
+    point_setSet(cluster->points[rootA], rootB);
+    cluster->sz[rootB] += cluster->sz[rootA];
+  }
+  else {
+    point_setSet(cluster->points[rootB], rootA);
+    cluster->sz[rootA] += cluster->sz[rootB];
+  }
+}
+
+void cluster_kruskal(Cluster cluster) {
+
+  _MST_init(cluster);
 
   for (int i = 0; i < cluster->distances_size; i++) {
-    Point pA = distance_getPoint(cluster->distances[i], 1);
-    Point pB = distance_getPoint(cluster->distances[i], 0);
+    Point pA = distance_getPoint(cluster->distances[i], PA);
+    Point pB = distance_getPoint(cluster->distances[i], PB);
 
     int setA = point_getSet(pA);
     int setB = point_getSet(pB);
 
     if (setA != setB) {
-      
-      int j = setA;
-      while(j != point_getSet(cluster->points[j]))
-      {
-        j = point_getSet(cluster->points[j]);
-      }
-      int rootA = j;
-
-
-      int k = setB;
-      while(k != point_getSet(cluster->points[k]))
-      {
-        k = point_getSet(cluster->points[k]);
-      }
-      int rootB = k;
-
-      if (sz[rootA] < sz[rootB]) {
-        point_setSet(cluster->points[rootA], rootB);
-        sz[rootB] += sz[rootA];
-      }
-      else {
-        point_setSet(cluster->points[rootB], rootA);
-        sz[rootA] += sz[rootB];
-      }
+      _MST_union(cluster, setA, setB);
     }
   }
 
@@ -189,5 +203,6 @@ void cluster_destroy(Cluster cluster)
     point_destroy(cluster->points[i]);
   
   free(cluster->points);
+  free(cluster->sz);
   free(cluster);
 }
