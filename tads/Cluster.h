@@ -97,7 +97,8 @@ void _MST_union(Cluster cluster, int setA, int setB);
  * @param cluster The cluster for which Kruskal's algorithm is performed.
  */
 void cluster_kruskal();
-void cluster_identifyGroups(int k);
+
+void cluster_identifyGroups(Cluster cluster, int k);
 void cluster_generateResult(char *filename);
 
 /**

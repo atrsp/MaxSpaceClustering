@@ -80,6 +80,7 @@ void cluster_read(Cluster cluster, char *filepath)
     }
 
     cluster->points[cluster->n] = point;
+    point_setIdx(point, cluster->n);
     cluster->n++;
   }
 
@@ -157,6 +158,24 @@ int _MST_findRoot(Cluster cluster, int pointSet) {
   return pointSet;
 }
 
+int _MST_findPreRoot(Cluster cluster, Point p, int pointSet) {
+  int root = _MST_findRoot(cluster, pointSet);
+  int preRoot = 0;
+  
+  if (pointSet == root) preRoot = point_getIdx(p); //"pre root" == itself's index in the cluster->points array
+
+  while(pointSet != root) //this while gets the "pre root" of the point, to create the cut in the tree afterwards
+  {
+    if (point_getSet(cluster->points[pointSet]) == root) {
+      preRoot = pointSet;
+      break;
+    }
+    pointSet = point_getSet(cluster->points[pointSet]);
+  }
+
+  return preRoot;
+}
+
 void _MST_union(Cluster cluster, int setA, int setB) {
   int rootA = _MST_findRoot(cluster, setA);
   int rootB = _MST_findRoot(cluster, setB);
@@ -169,6 +188,13 @@ void _MST_union(Cluster cluster, int setA, int setB) {
     point_setSet(cluster->points[rootB], rootA);
     cluster->sz[rootA] += cluster->sz[rootB];
   }
+
+  printf("sz[2] = %d\n", cluster->sz[2]);
+}
+
+void _MST_cut(Cluster cluster, int pointSet) {
+  Point p = cluster->points[pointSet]; // point of preRoot to be cutted (pointSet)
+  point_setSet(p, pointSet); // sets the point to be cutted Set variable to itself, "cutting" the connection from it's previous root
 }
 
 void cluster_kruskal(Cluster cluster) {
@@ -193,6 +219,57 @@ void cluster_kruskal(Cluster cluster) {
     printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
   }
   printf("\n");
+}
+
+void cluster_identifyGroups(Cluster cluster, int k) {
+  int nCuts = 0;
+  int preRootA = 0;
+  int preRootB = 0;
+  int nTreeA = 0; //sz[a]
+  int nTreeB = 0; //sz[b]
+
+  for (int i = cluster->distances_size-1; i >= 0; i--) {
+    if (nCuts == k-1) break; // for k=3 groups, we need 2 cuts in the tree, for example
+
+    Point pA = distance_getPoint(cluster->distances[i], PA);
+    Point pB = distance_getPoint(cluster->distances[i], PB);
+
+    int setA = point_getSet(pA);
+    int setB = point_getSet(pB);
+
+    if (_MST_isConnected(cluster, setA, setB)) { // get the points from the distance array and check if they are connected
+      
+      preRootA = _MST_findPreRoot(cluster, pA, setA); // get preRoot of pointB
+      preRootB = _MST_findPreRoot(cluster, pB, setB); // get preRoot of pointB
+
+      nTreeA = cluster->sz[preRootA];
+      nTreeB = cluster->sz[preRootB];
+      printf("\n\nnTreeA: %d; nTreeB: %d\n\n", nTreeA, nTreeB);
+
+      if (nTreeA >= nTreeB) { // compares if pA tree branch (from sz array) is bigger than pB's
+        _MST_cut(cluster, preRootA); // cuts connection from pointA to root
+      }
+      else {
+        _MST_cut(cluster, preRootB); // cuts connection from pointB to root
+      }
+
+      nCuts+=1;
+    }
+    else continue; // points are already not connected -> group already identified
+  }
+
+  for (int i = 0; i < cluster->n; i++) {
+    printf("sz[%d] = %d ", i, cluster->sz[i]);
+  }
+  printf("\n");
+
+  printf("\n");
+  for (int i = 0; i < cluster->n; i++) {
+    int set = point_getSet(cluster->points[i]);
+    printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
+  }
+  printf("\n");
+
 }
 
 void cluster_destroy(Cluster cluster)

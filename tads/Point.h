@@ -64,6 +64,11 @@ int point_getSet(Point p);
  */
 void point_setCoord(Point point, int i, double coord);
 
+
+void point_setIdx(Point point, int idx);
+
+int point_getIdx(Point point);
+
 /**
  * Calculates the Euclidian Distance between two points.
  *
