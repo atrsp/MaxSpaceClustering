@@ -41,6 +41,15 @@ double distance_getValue (Distance d);
 char* distance_getPointId (Distance d, int whichPoint);
 
 /**
+ * Retrieves one of the points from a distance object.
+ * 
+ * @param d The distance object from which to retrieve the point.
+ * @param whichPoint An integer constant representing which point to retrieve (PA or PB).
+ * @return The Point object corresponding to the specified point (PA or PB) in the distance object.
+ */
+Point distance_getPoint (Distance d, int whichPoint);
+
+/**
  * Comparison function for sorting distances (crescent order).
  *
  * @param a Pointer to the first Distance object.

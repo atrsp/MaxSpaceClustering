@@ -10,10 +10,13 @@ all: main.c tads/Cluster.c tads/Cluster.h tads/Point.c tads/Point.h tads/Distanc
 	@gcc -o main $(COMPILED)/main.o $(COMPILED)/Cluster.o $(COMPILED)/Point.o $(COMPILED)/Distance.o -lm
 
 run:
-	./main in-exemplos/1.txt
+	./main in-exemplos/5.txt 10
+
+run_spec:
+	./main in-exemplos/spec.txt 3
 
 valgrind:
-	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/1.txt
+	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/5.txt 10
 
 clean:
 	@rm -f $(COMPILED)/*.o
