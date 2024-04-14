@@ -211,12 +211,12 @@ void cluster_kruskal(Cluster cluster) {
     }
   }
 
-  // printf("\n");
-  // for (int i = 0; i < cluster->n; i++) {
-  //   int set = point_getSet(cluster->points[i]);
-  //   printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
-  // }
-  // printf("\n");
+  printf("\n");
+  for (int i = 0; i < cluster->n; i++) {
+    int set = point_getSet(cluster->points[i]);
+    printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
+  }
+  printf("\n");
 }
 
 void cluster_identifyGroups(Cluster cluster, int k) {
@@ -268,12 +268,12 @@ void cluster_identifyGroups(Cluster cluster, int k) {
   // }
   // printf("\n");
 
-  // printf("\n");
-  // for (int i = 0; i < cluster->n; i++) {
-  //   int set = point_getSet(cluster->points[i]);
-  //   printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
-  // }
-  // printf("\n");
+  printf("\n");
+  for (int i = 0; i < cluster->n; i++) {
+    int set = point_getSet(cluster->points[i]);
+    printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
+  }
+  printf("\n");
 
 }
 
