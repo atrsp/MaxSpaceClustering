@@ -83,6 +83,17 @@ bool _MST_isConnected(Cluster cluster, int setA, int setB);
 int _MST_findRoot(Cluster cluster, int pointSet);
 
 /**
+ * Finds the "pre root" of a point in a MST.
+ *
+ * @param cluster   The cluster containing the points.
+ * @param idx       The index of the point to find the "pre root" for.
+ * @param pointSet  The set of the point (immediate parent).
+ * @param root      The root of the set.
+ * @return          The index of the "pre root" of the point.
+ */
+int _MST_findPreRoot(Cluster cluster, int idx, int pointSet, int root);
+
+/**
  * Combines two point sets in the cluster.
  * 
  * @param cluster The cluster containing the sets to be combined.
@@ -92,13 +103,29 @@ int _MST_findRoot(Cluster cluster, int pointSet);
 void _MST_union(Cluster cluster, int setA, int setB);
 
 /**
+ * Cuts the connection of a point with its previous root.
+ *
+ * @param cluster   The cluster containing the points.
+ * @param pointSet  The set of the point to be cut.
+ */
+void _MST_cut(Cluster cluster, int pointSet);
+
+/**
  * Performs Kruskal's algorithm on the cluster to construct a minimum spanning tree.
  * 
  * @param cluster The cluster for which Kruskal's algorithm is performed.
  */
 void cluster_kruskal();
 
+/**
+ * Identifies groups within the cluster by performing cuts on the minimum spanning tree (MST).
+ * Groups are identified based on the given value of k.
+ *
+ * @param cluster   The cluster containing the points and distances.
+ * @param k         The number of groups to identify.
+ */
 void cluster_identifyGroups(Cluster cluster, int k);
+
 void cluster_generateResult(char *filename);
 
 /**

@@ -64,9 +64,20 @@ int point_getSet(Point p);
  */
 void point_setCoord(Point point, int i, double coord);
 
-
+/**
+ * Sets the index of a point equivalent in a points array.
+ *
+ * @param point The point to set the index for.
+ * @param idx   The index value to set.
+ */
 void point_setIdx(Point point, int idx);
 
+/**
+ * Retrieves the index of a point equivalent in a points array.
+ *
+ * @param point The point to retrieve the index from.
+ * @return      The index of the point.
+ */
 int point_getIdx(Point point);
 
 /**
