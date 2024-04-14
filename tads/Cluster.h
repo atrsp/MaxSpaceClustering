@@ -126,7 +126,7 @@ void cluster_kruskal();
  */
 void cluster_identifyGroups(Cluster cluster, int k);
 
-void cluster_generateResult(char *filename);
+void cluster_generateResult(Cluster cluster, char *fileName);
 
 /**
  * Destroys a cluster.

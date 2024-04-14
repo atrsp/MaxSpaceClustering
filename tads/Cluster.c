@@ -277,6 +277,21 @@ void cluster_identifyGroups(Cluster cluster, int k) {
 
 }
 
+void cluster_generateResult(Cluster cluster, char *fileName) {
+  FILE* file;
+
+  file = fopen(fileName, "w");
+
+  if (file == NULL) {
+    printf("Error opening output file.\n");
+    return;
+  }
+
+  fprintf(file, "Hello, File!\n");
+
+  fclose(file);
+}
+
 void cluster_destroy(Cluster cluster)
 {
   distance_destroy(cluster->distances, cluster->distances_size);
