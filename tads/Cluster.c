@@ -365,7 +365,11 @@ void cluster_destroy(Cluster cluster)
   for (int i = 0; i < cluster->n; i++)
     point_destroy(cluster->points[i]);
 
+  for (int i = 0; i < cluster->k; i++)
+    group_destroy(cluster->groups[i]);
+
   free(cluster->points);
+  free(cluster->groups);
   free(cluster->sz);
   free(cluster);
 }
