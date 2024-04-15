@@ -72,7 +72,7 @@ void group_printOnFile(Group group, FILE *file)
   {
     if (i < group->points_u - 1)
     {
-      fprintf(file, "%s, ", group->pointsIds[i]);
+      fprintf(file, "%s,", group->pointsIds[i]);
     }
     else
     {
