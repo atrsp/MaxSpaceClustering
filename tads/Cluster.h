@@ -10,9 +10,10 @@ typedef struct cluster *Cluster;
  *
  * Uses calloc() from stdlib to allocate memory for the cluster.
  *
+ * @param k The number of groups to be formed.
  * @return A pointer to the cluster.
  */
-Cluster cluster_init();
+Cluster cluster_init(int k);
 
 /**
  * Reads a file containing points and save them in the cluster.
@@ -37,35 +38,35 @@ void _cluster_printPoints(Cluster cluster);
 
 /**
  * Prints the distances between points in the cluster.
- * 
+ *
  * @param cluster The cluster containing the distances to be printed.
  */
 void _cluster_printDistances(Cluster cluster);
 
 /**
  * Calculates the distances between points in the cluster and stores them in the cluster's distances array.
- * 
+ *
  * @param cluster The cluster for which distances are to be calculated.
  */
 void cluster_calcDistances(Cluster cluster);
 
 /**
  * Sorts the distances in the cluster's distances array with qsort() function.
- * 
+ *
  * @param cluster The cluster containing the distances to be sorted.
  */
 void cluster_sortDistances(Cluster cluster);
 
 /**
  * Initializes the sz array and assigns each point to its own set in the cluster.
- * 
+ *
  * @param cluster The cluster for which the sz array and point sets are initialized.
  */
 void _MST_init(Cluster cluster);
 
 /**
  * Checks if two point sets in the cluster are connected.
- * 
+ *
  * @param cluster The cluster containing the sets.
  * @param setA The index of the first set.
  * @param setB The index of the second set.
@@ -75,7 +76,7 @@ bool _MST_isConnected(Cluster cluster, int setA, int setB);
 
 /**
  * Finds the root of the set containing the specified point.
- * 
+ *
  * @param cluster The cluster containing the point sets.
  * @param pointSet The index of the point set to find the root for.
  * @return The index of the root of the set containing the specified point.
@@ -95,7 +96,7 @@ int _MST_findPreRoot(Cluster cluster, int idx, int pointSet, int root);
 
 /**
  * Combines two point sets in the cluster.
- * 
+ *
  * @param cluster The cluster containing the sets to be combined.
  * @param setA The index of the first set.
  * @param setB The index of the second set.
@@ -112,7 +113,7 @@ void _MST_cut(Cluster cluster, int pointSet);
 
 /**
  * Performs Kruskal's algorithm on the cluster to construct a minimum spanning tree.
- * 
+ *
  * @param cluster The cluster for which Kruskal's algorithm is performed.
  */
 void cluster_kruskal();

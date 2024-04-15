@@ -1,5 +1,7 @@
 #include "Group.h"
 
+#include <stdlib.h>
+
 struct group
 {
   char *rootId;     // The identifier of the root point
@@ -31,6 +33,21 @@ void group_addPoint(Group group, char *pointId)
   }
 
   group->pointsIds[group->points_u++] = pointId;
+}
+
+char *group_getRootId(Group group)
+{
+  return group->rootId;
+}
+
+int group_getSize(Group group)
+{
+  return group->points_u;
+}
+
+char *group_getPointId(Group group, int index)
+{
+  return group->pointsIds[index];
 }
 
 void group_destroy(Group group)
