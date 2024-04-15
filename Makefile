@@ -11,7 +11,7 @@ all: main.c tads/Cluster.c tads/Cluster.h tads/Point.c tads/Point.h tads/Distanc
 	@gcc -o main $(COMPILED)/main.o $(COMPILED)/Cluster.o $(COMPILED)/Point.o $(COMPILED)/Distance.o $(COMPILED)/Group.o -lm
 
 run:
-	./main in-exemplos/5.txt 10
+	./main in-exemplos/5.txt 10 saida.txt
 
 run_spec:
 	./main in-exemplos/spec.txt 3 saida.txt
@@ -20,7 +20,7 @@ run_unordered_spec:
 	./main in-exemplos/unordered_spec.txt 3 saida.txt
 
 valgrind:
-	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/5.txt 10
+	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/5.txt 10 saida.txt
 
 clean:
 	@rm -f $(COMPILED)/*.o

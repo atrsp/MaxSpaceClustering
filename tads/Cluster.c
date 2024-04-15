@@ -230,13 +230,13 @@ void cluster_kruskal(Cluster cluster)
     }
   }
 
-  printf("\n");
-  for (int i = 0; i < cluster->n; i++)
-  {
-    int set = point_getSet(cluster->points[i]);
-    printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
-  }
-  printf("\n");
+  // printf("\n");
+  // for (int i = 0; i < cluster->n; i++)
+  //{
+  // int set = point_getSet(cluster->points[i]);
+  // printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
+  //}
+  // printf("\n");
 }
 
 bool _group_exist(Cluster cluster, char *rootId)
@@ -289,7 +289,7 @@ void cluster_identifyGroups(Cluster cluster, int k)
       preRootA = _MST_findPreRoot(cluster, idxA, setA, root); // get preRoot of pointB
       preRootB = _MST_findPreRoot(cluster, idxB, setB, root); // get preRoot of pointB
 
-      printf("\ncut: pointA[%d]: %s; pointB[%d]: %s\n", idxA, point_getId(pA), idxB, point_getId(pB));
+      // printf("\ncut: pointA[%d]: %s; pointB[%d]: %s\n", idxA, point_getId(pA), idxB, point_getId(pB));
       nTreeA = cluster->sz[preRootA];
       nTreeB = cluster->sz[preRootB];
 

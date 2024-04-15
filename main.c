@@ -47,7 +47,12 @@ int main(int argc, char *argv[])
   cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
   printf("cluster_identifyGroups() time: %.2f seconds\n", cpu_time_used);
 
+  start = clock();
   cluster_generateResult(cluster, argv[3]);
+  end = clock();
+
+  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  printf("cluster_generateResult() time: %.2f seconds\n", cpu_time_used);
 
   // Proves that the points were read correctly
   // _cluster_printPoints(cluster);
