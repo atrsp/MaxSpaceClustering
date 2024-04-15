@@ -14,10 +14,10 @@ run:
 	./main in-exemplos/5.txt 10
 
 run_spec:
-	./main in-exemplos/spec.txt 3
+	./main in-exemplos/spec.txt 3 saida.txt
 
 run_unordered_spec:
-	./main in-exemplos/unordered_spec.txt 3
+	./main in-exemplos/unordered_spec.txt 3 saida.txt
 
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/5.txt 10

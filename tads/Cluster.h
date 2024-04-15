@@ -127,7 +127,15 @@ void cluster_kruskal();
  */
 void cluster_identifyGroups(Cluster cluster, int k);
 
-void cluster_generateResult(char *filename);
+/**
+ * Generates a result file containing the groups identified in the cluster.
+ *
+ * Uses fopen() and fprintf() from stdio to create and write to the result file.
+ *
+ * @param cluster The cluster containing the groups to be written to the result file.
+ * @param filename The name of the result file to be created.
+ */
+void cluster_generateResult(Cluster cluster, char *filename);
 
 /**
  * Destroys a cluster.

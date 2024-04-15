@@ -358,6 +358,33 @@ void cluster_identifyGroups(Cluster cluster, int k)
   // }
 }
 
+void cluster_generateResult(Cluster cluster, char *filename)
+{
+  FILE *file = fopen(filename, "w");
+
+  if (file == NULL)
+  {
+    printf("Error: File not found.\n");
+    exit(1);
+  }
+
+  // order each group by id
+  for (int i = 0; i < cluster->k; i++)
+  {
+    group_sort(cluster->groups[i]);
+  }
+
+  // order groups by first point id
+  qsort(cluster->groups, cluster->k, sizeof(Group), _group_compare);
+
+  for (int i = 0; i < cluster->k; i++)
+  {
+    group_printOnFile(cluster->groups[i], file);
+  }
+
+  fclose(file);
+}
+
 void cluster_destroy(Cluster cluster)
 {
   distance_destroy(cluster->distances, cluster->distances_size);
