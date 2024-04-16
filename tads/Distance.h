@@ -11,7 +11,7 @@ typedef struct distance *Distance;
  * @param arraySize The size of the array to be initialized.
  * @return An array of distances initialized to zero.
  */
-Distance* distance_arrayInit(int arraySize);
+Distance *distance_arrayInit(int arraySize);
 
 /**
  * Sets the values of a Distance object.
@@ -29,7 +29,7 @@ Distance distance_set(Point pA, Point pB, double distance);
  * @param d The Distance object.
  * @return The distance value.
  */
-double distance_getValue (Distance d);
+double distance_getValue(Distance d);
 
 /**
  * Retrieves the ID of one of the points in a Distance object.
@@ -38,16 +38,16 @@ double distance_getValue (Distance d);
  * @param whichPoint Specifies which point to get the ID from (0 for pointA, 1 for pointB).
  * @return The ID of the specified point.
  */
-char* distance_getPointId (Distance d, int whichPoint);
+char *distance_getPointId(Distance d, int whichPoint);
 
 /**
  * Retrieves one of the points from a distance object.
- * 
+ *
  * @param d The distance object from which to retrieve the point.
  * @param whichPoint An integer constant representing which point to retrieve (PA or PB).
  * @return The Point object corresponding to the specified point (PA or PB) in the distance object.
  */
-Point distance_getPoint (Distance d, int whichPoint);
+Point distance_getPoint(Distance d, int whichPoint);
 
 /**
  * Comparison function for sorting distances (crescent order).
@@ -56,14 +56,16 @@ Point distance_getPoint (Distance d, int whichPoint);
  * @param b Pointer to the second Distance object.
  * @return Negative value if the first distance is smaller, positive value if the first distance is larger, 0 if equal.
  */
-int _distance_compare(const void* a, const void* b);
+int _distance_compare(const void *a, const void *b);
 
 /**
  * Deallocates memory for an array of Distance objects.
  *
  * @param d The array of Distance objects.
  * @param size The size of the array.
+ *
+ * @deprecated
  */
-void distance_destroy (Distance* d, int size);
+void distance_destroy(Distance *d, int size);
 
 #endif
