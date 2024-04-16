@@ -24,6 +24,7 @@ struct cluster
   int *sz; // For each item, gives the number of objects in the tree rooted in that item
 
   Group *groups;
+  int groups_a;
   int groups_u;
 
   Distance *edges; // Array of edges
@@ -35,7 +36,15 @@ Cluster cluster_init(int k)
   cluster->points_alloc = 2;
   cluster->points = (Point *)calloc(cluster->points_alloc, sizeof(Point));
   cluster->k = k;
+
   cluster->groups = (Group *)calloc(cluster->k, sizeof(Group));
+  cluster->groups_a = k;
+  cluster->groups_u = 0;
+
+  // for (int i = 0; i < cluster->k; i++)
+  // {
+  //   cluster->groups[i] = group_init();
+  // }
 
   return cluster;
 }
@@ -236,7 +245,6 @@ void cluster_kruskal(Cluster cluster)
       _MST_union(cluster, rootA, rootB);
 
       // add edge to the edges array
-      printf("Edge %d: %s - %s\n", edgesIndex, point_getId(pA), point_getId(pB));
       cluster->edges[edgesIndex] = cluster->distances[i];
       edgesIndex++;
     }
@@ -250,12 +258,12 @@ void cluster_kruskal(Cluster cluster)
 
 Group _exist_group_that_contains(Cluster cluster, char *pointId)
 {
-  for (int i = 0; i < cluster->k; i++)
+  for (int i = 0; i < cluster->groups_u; i++)
   {
     Group g = cluster->groups[i];
 
     if (g == NULL)
-      break;
+      continue;
 
     for (int j = 0; j < group_getSize(g); j++)
     {
@@ -265,6 +273,20 @@ Group _exist_group_that_contains(Cluster cluster, char *pointId)
   }
 
   return NULL;
+}
+
+void _merge_groups(Group groupA, Group groupB)
+{
+  for (int i = 0; i < group_getSize(groupB); i++)
+  {
+    group_addPoint(groupA, group_getPointId(groupB, i));
+  }
+
+  // group_setSize(groupA, group_getSize(groupA) + group_getSize(groupB));
+  group_vanish(groupB);
+
+  printf("Size after merge A: %d\n", group_getSize(groupA));
+  printf("Size after merge B: %d\n", group_getSize(groupB));
 }
 
 void cluster_identifyGroups(Cluster cluster, int k)
@@ -282,43 +304,64 @@ void cluster_identifyGroups(Cluster cluster, int k)
     char *pB_id = point_getId(pB);
 
     Group groupA = _exist_group_that_contains(cluster, pA_id);
-    if (groupA != NULL)
+    Group groupB = _exist_group_that_contains(cluster, pB_id);
+
+    if (groupA != NULL && groupB == NULL)
     {
-      // Add pB to the group
+      printf("Adding %s to group of %s\n", pB_id, pA_id);
       group_addPoint(groupA, pB_id);
     }
-    else
+    else if (groupA == NULL && groupB != NULL)
     {
-      Group groupB = _exist_group_that_contains(cluster, pB_id);
-      if (groupB != NULL)
-      {
-        // Add pA to the group
-        group_addPoint(groupB, pA_id);
-      }
-      else
-      {
-        // Create a new group
-        cluster->groups[cluster->groups_u] = group_init();
+      printf("Adding %s to group of %s\n", pA_id, pB_id);
+      group_addPoint(groupB, pA_id);
+    }
+    else if (groupA != NULL && groupB != NULL)
+    {
+      printf("Merging groups of %s and %s\n", pA_id, pB_id);
+      _merge_groups(groupA, groupB);
+    }
+    else if (groupA == NULL && groupB == NULL)
+    {
+      printf("Creating a new group\n");
 
-        // Add pA and pB to the group
-        group_addPoint(cluster->groups[cluster->groups_u], pA_id);
-        group_addPoint(cluster->groups[cluster->groups_u], pB_id);
-
-        cluster->groups_u++;
+      if (cluster->groups_u == cluster->groups_a)
+      {
+        cluster->groups_a += 1;
+        cluster->groups = (Group *)realloc(cluster->groups, cluster->groups_a * sizeof(Group));
       }
+
+      // Add pA and pB to the group
+      cluster->groups[cluster->groups_u] = group_init();
+
+      group_addPoint(cluster->groups[cluster->groups_u], pA_id);
+      group_addPoint(cluster->groups[cluster->groups_u], pB_id);
+      printf("%s and %s added to the new group\n\n", pA_id, pB_id);
+
+      cluster->groups_u++;
     }
   }
 
-  // for (int i = 0; i < k; i++)
-  // {
-  //   printf("\nGroup %d\n", i);
-  //   printf("Size: %d\n", group_getSize(cluster->groups[i]));
+  // Simulando a impressao dos grupos
+  int numberOfGroups = 0;
+  for (int i = 0; i < cluster->groups_u; i++)
+  {
+    if (group_getSize(cluster->groups[i]) == 0)
+    {
+      continue;
+    }
 
-  //   for (int j = 0; j < group_getSize(cluster->groups[i]); j++)
-  //   {
-  //     printf("Point %d: %s\n", j, group_getPointId(cluster->groups[i], j));
-  //   }
-  // }
+    printf("\nGroup\n");
+    printf("Size: %d\n", group_getSize(cluster->groups[i]));
+
+    for (int j = 0; j < group_getSize(cluster->groups[i]); j++)
+    {
+      // printf("Point %d: %s\n", j, group_getPointId(cluster->groups[i], j));
+    }
+    numberOfGroups++;
+  }
+
+  printf("\nNumber of groups: %d\n", numberOfGroups);
 }
 
 void cluster_generateResult(Cluster cluster, char *filename)

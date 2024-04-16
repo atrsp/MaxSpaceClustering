@@ -45,6 +45,21 @@ char *group_getRootId(Group group);
 int group_getSize(Group group);
 
 /**
+ * @brief Sets the size of a group.
+ *
+ * @param group The group.
+ * @param size The new size.
+ */
+void group_setSize(Group group, int size);
+
+/**
+ * @brief Remove all points and make size equal to 0.
+ *
+ * @param group The group.
+ */
+void group_vanish(Group group);
+
+/**
  * @brief Gets the identifier of a point in a group.
  *
  * @param group The group.

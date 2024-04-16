@@ -16,6 +16,8 @@ Group group_init()
   group->points_a = 2;
   group->pointsIds = (char **)calloc(group->points_a, sizeof(char *));
 
+  group->points_u = 0;
+
   return group;
 }
 
@@ -27,12 +29,28 @@ void group_addPoint(Group group, char *pointId)
     group->pointsIds = (char **)realloc(group->pointsIds, group->points_a * sizeof(char *));
   }
 
-  group->pointsIds[group->points_u++] = pointId;
+  group->pointsIds[group->points_u] = pointId;
+  group->points_u++;
 }
 
 int group_getSize(Group group)
 {
   return group->points_u;
+}
+
+void group_setSize(Group group, int size)
+{
+  group->points_u = size;
+}
+
+void group_vanish(Group group)
+{
+  for (int i = 0; i < group->points_u; i++)
+  {
+    group->pointsIds[i] = NULL;
+  }
+
+  group->points_u = 0;
 }
 
 char *group_getPointId(Group group, int index)
