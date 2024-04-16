@@ -374,18 +374,30 @@ void cluster_generateResult(Cluster cluster, char *filename)
     exit(1);
   }
 
-  // order each group by id
+  // get the real groups array
+  Group real[cluster->k];
+
+  int idx = 0;
+  for (int i = 0; i < cluster->groups_u; i++)
+  {
+    if (group_getSize(cluster->groups[i]) > 0)
+    {
+      real[idx] = cluster->groups[i];
+      idx++;
+    }
+  }
+
   for (int i = 0; i < cluster->k; i++)
   {
-    group_sort(cluster->groups[i]);
+    group_sort(real[i]);
   }
 
   // order groups by first point id
-  qsort(cluster->groups, cluster->k, sizeof(Group), _group_compare);
+  qsort(real, cluster->k, sizeof(Group), _group_compare);
 
   for (int i = 0; i < cluster->k; i++)
   {
-    group_printOnFile(cluster->groups[i], file);
+    group_printOnFile(real[i], file);
   }
 
   fclose(file);
@@ -405,7 +417,7 @@ void cluster_destroy(Cluster cluster)
   for (int i = 0; i < cluster->n; i++)
     point_destroy(cluster->points[i]);
 
-  for (int i = 0; i < cluster->k; i++)
+  for (int i = 0; i < cluster->groups_u; i++)
     group_destroy(cluster->groups[i]);
 
   free(cluster->points);
