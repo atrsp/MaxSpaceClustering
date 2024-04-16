@@ -19,6 +19,12 @@ run_spec:
 run_unordered_spec:
 	./main in-exemplos/unordered_spec.txt 3 saida.txt
 
+run_30k:
+	./main in-exemplos/30k_5dim.txt 10 saida.txt
+
+valgrind_30k:
+	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/30k_5dim.txt 10 saida.txt
+
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/5.txt 10 saida.txt
 

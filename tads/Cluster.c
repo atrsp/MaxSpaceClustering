@@ -69,7 +69,7 @@ void cluster_read(Cluster cluster, char *filepath)
   {
     if (cluster->n == cluster->points_alloc)
     {
-      cluster->points_alloc *= 2;
+      cluster->points_alloc += 1;
       cluster->points = (Point *)realloc(cluster->points, cluster->points_alloc * sizeof(Point));
     }
 
@@ -125,7 +125,7 @@ void cluster_calcDistances(Cluster cluster)
   cluster->distances = distance_arrayInit(cluster->distances_size);
 
   int distancesIndex = 0;
-  for (int j = 0; j < cluster->n; j++)
+  for (int j = 0; j < cluster->n - 1; j++)
   {
     for (int k = j + 1; k < cluster->n; k++)
     {
@@ -229,14 +229,6 @@ void cluster_kruskal(Cluster cluster)
       _MST_union(cluster, rootA, rootB);
     }
   }
-
-  // printf("\n");
-  // for (int i = 0; i < cluster->n; i++)
-  //{
-  // int set = point_getSet(cluster->points[i]);
-  // printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
-  //}
-  // printf("\n");
 }
 
 bool _group_exist(Cluster cluster, char *rootId)
@@ -333,7 +325,11 @@ void cluster_identifyGroups(Cluster cluster, int k)
     if (_group_exist(cluster, rootId)) // se o grupo já existe
     {
       Group g = _group_get(cluster, rootId);
-      group_addPoint(g, point_getId(cluster->points[j]));
+
+      if (rootId != point_getId(cluster->points[j]))
+      {
+        group_addPoint(g, point_getId(cluster->points[j]));
+      }
     }
     else // se o grupo não existe
     {
