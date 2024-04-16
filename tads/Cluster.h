@@ -125,7 +125,7 @@ void cluster_kruskal();
  * @param cluster   The cluster containing the points and distances.
  * @param k         The number of groups to identify.
  */
-void cluster_identifyGroups(Cluster cluster, int k);
+void cluster_identifyGroups(Cluster cluster);
 
 /**
  * Generates a result file containing the groups identified in the cluster.

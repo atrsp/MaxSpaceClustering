@@ -41,11 +41,6 @@ Cluster cluster_init(int k)
   cluster->groups_a = k;
   cluster->groups_u = 0;
 
-  // for (int i = 0; i < cluster->k; i++)
-  // {
-  //   cluster->groups[i] = group_init();
-  // }
-
   return cluster;
 }
 
@@ -86,13 +81,11 @@ void cluster_read(Cluster cluster, char *filepath)
 
     char *token = strtok(line, ","); // get the point id
     Point point = point_init(cluster->m, strlen(token) + 1);
-    // printf("ID: %s\n", token);
     point_setId(point, token);
 
     for (int i = 0; i < cluster->m; i++)
     {
       token = strtok(NULL, ",");
-      // printf("Coord: %s\n", token);
       point_setCoord(point, i, atof(token));
     }
 
@@ -111,10 +104,6 @@ void cluster_read(Cluster cluster, char *filepath)
 
 void _cluster_printPoints(Cluster cluster)
 {
-  // printf("\nquantity of points (n): %d;\n", cluster->n);
-  // printf("space size (m): %d;\n", cluster->m);
-  // printf("distances array size: %d.\n\n", cluster->distances_size);
-
   for (int i = 0; i < cluster->n; i++)
   {
     printf("Point %d\n", i);
@@ -282,17 +271,13 @@ void _merge_groups(Group groupA, Group groupB)
     group_addPoint(groupA, group_getPointId(groupB, i));
   }
 
-  // group_setSize(groupA, group_getSize(groupA) + group_getSize(groupB));
   group_vanish(groupB);
-
-  printf("Size after merge A: %d\n", group_getSize(groupA));
-  printf("Size after merge B: %d\n", group_getSize(groupB));
 }
 
-void cluster_identifyGroups(Cluster cluster, int k)
+void cluster_identifyGroups(Cluster cluster)
 {
   int edgesSize = cluster->n - 1;
-  int numberOfGroupSeparations = k - 1;
+  int numberOfGroupSeparations = cluster->k - 1;
 
   for (int i = 0; i < (edgesSize - numberOfGroupSeparations); i++)
   {
@@ -308,23 +293,18 @@ void cluster_identifyGroups(Cluster cluster, int k)
 
     if (groupA != NULL && groupB == NULL)
     {
-      printf("Adding %s to group of %s\n", pB_id, pA_id);
       group_addPoint(groupA, pB_id);
     }
     else if (groupA == NULL && groupB != NULL)
     {
-      printf("Adding %s to group of %s\n", pA_id, pB_id);
       group_addPoint(groupB, pA_id);
     }
     else if (groupA != NULL && groupB != NULL)
     {
-      printf("Merging groups of %s and %s\n", pA_id, pB_id);
       _merge_groups(groupA, groupB);
     }
     else if (groupA == NULL && groupB == NULL)
     {
-      printf("Creating a new group\n");
-
       if (cluster->groups_u == cluster->groups_a)
       {
         cluster->groups_a += 1;
@@ -336,32 +316,10 @@ void cluster_identifyGroups(Cluster cluster, int k)
 
       group_addPoint(cluster->groups[cluster->groups_u], pA_id);
       group_addPoint(cluster->groups[cluster->groups_u], pB_id);
-      printf("%s and %s added to the new group\n\n", pA_id, pB_id);
 
       cluster->groups_u++;
     }
   }
-
-  // Simulando a impressao dos grupos
-  int numberOfGroups = 0;
-  for (int i = 0; i < cluster->groups_u; i++)
-  {
-    if (group_getSize(cluster->groups[i]) == 0)
-    {
-      continue;
-    }
-
-    printf("\nGroup\n");
-    printf("Size: %d\n", group_getSize(cluster->groups[i]));
-
-    for (int j = 0; j < group_getSize(cluster->groups[i]); j++)
-    {
-      // printf("Point %d: %s\n", j, group_getPointId(cluster->groups[i], j));
-    }
-    numberOfGroups++;
-  }
-
-  printf("\nNumber of groups: %d\n", numberOfGroups);
 }
 
 void cluster_generateResult(Cluster cluster, char *filename)

@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   printf("cluster_kruskal() time: %.2f seconds\n", cpu_time_used);
 
   start = clock();
-  cluster_identifyGroups(cluster, atoi(argv[2]));
+  cluster_identifyGroups(cluster);
   end = clock();
 
   cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
