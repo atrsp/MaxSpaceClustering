@@ -272,103 +272,77 @@ Group _group_get(Cluster cluster, char *rootId)
   return NULL;
 }
 
+Group _exist_group_that_contains(Cluster cluster, char *pointId)
+{
+  for (int i = 0; i < cluster->k; i++)
+  {
+    Group g = cluster->groups[i];
+
+    if (g == NULL)
+      break;
+
+    for (int j = 0; j < group_getSize(g); j++)
+    {
+      if (strcmp(group_getPointId(g, j), pointId) == 0)
+        return g;
+    }
+  }
+
+  return NULL;
+}
+
 void cluster_identifyGroups(Cluster cluster, int k)
 {
-  // int nCuts = 0;
-  // int root = 0;
-  // int preRootA = 0, preRootB = 0;
-  // int nTreeA = 0, nTreeB = 0; // subtree sizes
+  int edgesSize = cluster->n - 1;
+  int numberOfGroupSeparations = k - 1;
 
-  // for (int i = cluster->distances_size - 1; i >= 0; i--)
-  // {
-  //   if (nCuts == k - 1)
-  //     break; // for k=3 groups, we need 2 cuts in the tree, for example
+  for (int i = 0; i < (edgesSize - numberOfGroupSeparations); i++)
+  {
+    Distance edge = cluster->edges[i];
+    Point pA = distance_getPoint(edge, PA);
+    Point pB = distance_getPoint(edge, PB);
 
-  //   Point pA = distance_getPoint(cluster->distances[i], PA);
-  //   Point pB = distance_getPoint(cluster->distances[i], PB);
+    char *pA_id = point_getId(pA);
+    char *pB_id = point_getId(pB);
 
-  //   int setA = point_getSet(pA);
-  //   int setB = point_getSet(pB);
-  //   int idxA = point_getIdx(pA);
-  //   int idxB = point_getIdx(pB);
+    Group groupA = _exist_group_that_contains(cluster, pA_id);
+    if (groupA != NULL)
+    {
+      // Add pB to the group
+      group_addPoint(groupA, pB_id);
+    }
+    else
+    {
+      Group groupB = _exist_group_that_contains(cluster, pB_id);
+      if (groupB != NULL)
+      {
+        // Add pA to the group
+        group_addPoint(groupB, pA_id);
+      }
+      else
+      {
+        // Create a new group
+        cluster->groups[cluster->groups_u] = group_init();
 
-  //   if (_MST_isConnected(cluster, setA, setB))
-  //   { // get the points from the distance array and check if they are connected
-  //     root = _MST_findRoot(cluster, setA);
-  //     preRootA = _MST_findPreRoot(cluster, idxA, setA, root); // get preRoot of pointB
-  //     preRootB = _MST_findPreRoot(cluster, idxB, setB, root); // get preRoot of pointB
+        // Add pA and pB to the group
+        group_addPoint(cluster->groups[cluster->groups_u], pA_id);
+        group_addPoint(cluster->groups[cluster->groups_u], pB_id);
 
-  //     // printf("\ncut: pointA[%d]: %s; pointB[%d]: %s\n", idxA, point_getId(pA), idxB, point_getId(pB));
-  //     nTreeA = cluster->sz[preRootA];
-  //     nTreeB = cluster->sz[preRootB];
+        cluster->groups_u++;
+      }
+    }
+  }
 
-  //     if (nTreeA < nTreeB)
-  //     { // compares if pA tree branch (from sz array) is smaller than pB's
-  //       if (preRootB == root)
-  //       {
-  //         _MST_cut(cluster, preRootA); // cuts connection from pointA to root
-  //       }
-  //       else
-  //         _MST_cut(cluster, preRootB);
-  //     }
-  //     else if (nTreeA >= nTreeB)
-  //     { // compares if pA tree branch (from sz array) is bigger than pB's
-  //       if (preRootA == root)
-  //       {
-  //         _MST_cut(cluster, preRootB); // cuts connection from pointB to root
-  //       }
-  //       else
-  //         _MST_cut(cluster, preRootA);
-  //     }
+  for (int i = 0; i < k; i++)
+  {
+    printf("\nGroup %d\n", i);
+    printf("Size: %d\n", group_getSize(cluster->groups[i]));
 
-  //     nCuts += 1;
-  //   }
-  //   else
-  //     continue; // points are already not connected -> group already identified
-  // }
-
-  // // Create 'k' groups
-  // for (int i = 0; i < k; i++)
-  // {
-  //   cluster->groups[i] = group_init();
-  // }
-
-  // for (int j = 0; j < cluster->n; j++)
-  // {
-  //   int set = point_getSet(cluster->points[j]);
-  //   int root = _MST_findRoot(cluster, set);
-  //   char *rootId = point_getId(cluster->points[root]);
-
-  //   if (_group_exist(cluster, rootId)) // se o grupo já existe
-  //   {
-  //     Group g = _group_get(cluster, rootId);
-
-  //     if (rootId != point_getId(cluster->points[j]))
-  //     {
-  //       group_addPoint(g, point_getId(cluster->points[j]));
-  //     }
-  //   }
-  //   else // se o grupo não existe
-  //   {
-  //     Group g = cluster->groups[cluster->groups_u];
-  //     group_setRootId(g, point_getId(cluster->points[root]));
-
-  //     group_addPoint(g, point_getId(cluster->points[root]));
-  //     cluster->groups_u++;
-  //   }
-  // }
-
-  // for (int i = 0; i < k; i++)
-  // {
-  //   printf("\nGroup %d\n", i);
-  //   printf("Root ID: %s\n", group_getRootId(cluster->groups[i]));
-  //   printf("Size: %d\n", group_getSize(cluster->groups[i]));
-
-  //   for (int j = 0; j < group_getSize(cluster->groups[i]); j++)
-  //   {
-  //     printf("Point %d: %s\n", j, group_getPointId(cluster->groups[i], j));
-  //   }
-  // }
+    for (int j = 0; j < group_getSize(cluster->groups[i]); j++)
+    {
+      printf("Point %d: %s\n", j, group_getPointId(cluster->groups[i], j));
+    }
+  }
 }
 
 void cluster_generateResult(Cluster cluster, char *filename)
