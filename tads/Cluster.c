@@ -248,30 +248,6 @@ void cluster_kruskal(Cluster cluster)
   }
 }
 
-bool _group_exist(Cluster cluster, char *rootId)
-{
-  for (int i = 0; i < cluster->k; i++)
-  {
-    char *groupRootId = group_getRootId(cluster->groups[i]);
-
-    if (groupRootId != NULL && strcmp(groupRootId, rootId) == 0)
-      return true;
-  }
-
-  return false;
-}
-
-Group _group_get(Cluster cluster, char *rootId)
-{
-  for (int i = 0; i < cluster->k; i++)
-  {
-    if (cluster->groups[i] != NULL && strcmp(group_getRootId(cluster->groups[i]), rootId) == 0)
-      return cluster->groups[i];
-  }
-
-  return NULL;
-}
-
 Group _exist_group_that_contains(Cluster cluster, char *pointId)
 {
   for (int i = 0; i < cluster->k; i++)
@@ -333,16 +309,16 @@ void cluster_identifyGroups(Cluster cluster, int k)
     }
   }
 
-  for (int i = 0; i < k; i++)
-  {
-    printf("\nGroup %d\n", i);
-    printf("Size: %d\n", group_getSize(cluster->groups[i]));
+  // for (int i = 0; i < k; i++)
+  // {
+  //   printf("\nGroup %d\n", i);
+  //   printf("Size: %d\n", group_getSize(cluster->groups[i]));
 
-    for (int j = 0; j < group_getSize(cluster->groups[i]); j++)
-    {
-      printf("Point %d: %s\n", j, group_getPointId(cluster->groups[i], j));
-    }
-  }
+  //   for (int j = 0; j < group_getSize(cluster->groups[i]); j++)
+  //   {
+  //     printf("Point %d: %s\n", j, group_getPointId(cluster->groups[i], j));
+  //   }
+  // }
 }
 
 void cluster_generateResult(Cluster cluster, char *filename)
@@ -386,8 +362,8 @@ void cluster_destroy(Cluster cluster)
   for (int i = 0; i < cluster->n; i++)
     point_destroy(cluster->points[i]);
 
-  // for (int i = 0; i < cluster->k; i++)
-  // group_destroy(cluster->groups[i]);
+  for (int i = 0; i < cluster->k; i++)
+    group_destroy(cluster->groups[i]);
 
   free(cluster->points);
   free(cluster->groups);

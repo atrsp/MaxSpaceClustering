@@ -25,6 +25,9 @@ run_30k:
 valgrind_30k:
 	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/30k_5dim.txt 10 saida.txt
 
+valgrind_spec:
+	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/spec.txt 3 saida.txt
+
 valgrind:
 	valgrind --leak-check=full --show-leak-kinds=all ./main in-exemplos/5.txt 10 saida.txt
 
