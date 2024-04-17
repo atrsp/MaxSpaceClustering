@@ -13,28 +13,12 @@ typedef struct group *Group;
 Group group_init();
 
 /**
- * @brief Sets the root identifier of a group.
- *
- * @param group The group.
- * @param rootId The root identifier.
- */
-void group_setRootId(Group group, char *rootId);
-
-/**
  * @brief Adds a point to a group.
  *
  * @param group The group.
  * @param pointId The identifier of the point to add.
  */
 void group_addPoint(Group group, char *pointId);
-
-/**
- * @brief Gets the root identifier of a group.
- *
- * @param group The group.
- * @return char* The root identifier.
- */
-char *group_getRootId(Group group);
 
 /**
  * @brief Gets the size of a group.
@@ -51,6 +35,22 @@ int group_getSize(Group group);
  * @param size The new size.
  */
 void group_setSize(Group group, int size);
+
+/**
+ * @brief Gets the identifier of a group.
+ *
+ * @param group The group.
+ * @return int The identifier of the group.
+ */
+int group_getId(Group group);
+
+/**
+ * @brief Sets the identifier of a group.
+ *
+ * @param group The group.
+ * @param id The new identifier.
+ */
+void group_setId(Group group, int id);
 
 /**
  * @brief Remove all points and make size equal to 0.
@@ -98,5 +98,7 @@ void group_printOnFile(Group group, FILE *file);
  * @param group The group.
  */
 void group_destroy(Group group);
+
+void _group_printAllAlloc(Group group);
 
 #endif

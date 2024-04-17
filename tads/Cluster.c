@@ -124,7 +124,7 @@ void _cluster_printDistances(Cluster cluster)
 
 void cluster_calcDistances(Cluster cluster)
 {
-  cluster->distances_size = (pow(cluster->n, 2) - cluster->n) / 2; // Size of the lower triangle of a square matrix n sized;
+  cluster->distances_size = ((cluster->n * cluster->n) - cluster->n) / 2; // Size of the lower triangle of a square matrix n sized;
   cluster->distances = distance_arrayInit(cluster->distances_size);
 
   int distancesIndex = 0;
@@ -301,7 +301,10 @@ void cluster_identifyGroups(Cluster cluster)
     }
     else if (groupA != NULL && groupB != NULL)
     {
-      _merge_groups(groupA, groupB);
+      if (group_getId(groupA) != group_getId(groupB))
+      {
+        _merge_groups(groupA, groupB);
+      }
     }
     else if (groupA == NULL && groupB == NULL)
     {
@@ -313,6 +316,7 @@ void cluster_identifyGroups(Cluster cluster)
 
       // Add pA and pB to the group
       cluster->groups[cluster->groups_u] = group_init();
+      group_setId(cluster->groups[cluster->groups_u], cluster->groups_u);
 
       group_addPoint(cluster->groups[cluster->groups_u], pA_id);
       group_addPoint(cluster->groups[cluster->groups_u], pB_id);
@@ -344,6 +348,8 @@ void cluster_generateResult(Cluster cluster, char *filename)
       idx++;
     }
   }
+
+  printf("idx: %d\n", idx);
 
   for (int i = 0; i < cluster->k; i++)
   {

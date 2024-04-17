@@ -37,11 +37,13 @@ void point_setId(Point point, char *id)
   strcpy(point->id, id);
 }
 
-void point_setSet(Point p, int set) {
+void point_setSet(Point p, int set)
+{
   p->set = set;
 }
 
-int point_getSet(Point p) {
+int point_getSet(Point p)
+{
   return p->set;
 }
 
@@ -50,24 +52,29 @@ void point_setCoord(Point point, int i, double coord)
   point->coords[i] = coord;
 }
 
-void point_setIdx(Point point, int idx) {
+void point_setIdx(Point point, int idx)
+{
   point->idx = idx;
 }
 
-int point_getIdx(Point point) {
+int point_getIdx(Point point)
+{
   return point->idx;
 }
 
-double point_euclidianDistance (Point pA, Point pB, int dimension)
+double point_euclidianDistance(Point pA, Point pB, int dimension)
 {
-    double distance = 0;
-    double sum = 0;
-    
-    for (int i=0; i < dimension; i++)
-      sum += pow((pA->coords[i] - pB->coords[i]), 2);
-    
-    distance = sqrt(sum);
-    return distance;
+  double distance = 0;
+  double sum = 0;
+
+  for (int i = 0; i < dimension; i++)
+  {
+    double diff = pA->coords[i] - pB->coords[i];
+    sum += diff * diff;
+  }
+
+  distance = sqrt(sum);
+  return distance;
 }
 
 void point_destroy(Point point)
