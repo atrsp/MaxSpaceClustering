@@ -37,10 +37,6 @@ Cluster cluster_init(int k)
   cluster->points = (Point *)calloc(cluster->points_alloc, sizeof(Point));
   cluster->k = k;
 
-  cluster->groups = (Group *)calloc(cluster->k, sizeof(Group));
-  cluster->groups_a = k;
-  cluster->groups_u = 0;
-
   return cluster;
 }
 
@@ -124,7 +120,7 @@ void _cluster_printDistances(Cluster cluster)
 
 void cluster_calcDistances(Cluster cluster)
 {
-  cluster->distances_size = (pow(cluster->n, 2) - cluster->n) / 2; // Size of the lower triangle of a square matrix n sized;
+  cluster->distances_size = ((cluster->n * cluster->n) - cluster->n) / 2; // Size of the lower triangle of a square matrix n sized;
   cluster->distances = distance_arrayInit(cluster->distances_size);
 
   int distancesIndex = 0;
@@ -276,6 +272,25 @@ void _merge_groups(Group groupA, Group groupB)
 
 void cluster_identifyGroups(Cluster cluster)
 {
+  // Init groups array
+  if (cluster->k > cluster->n) // WARNING: if k > n, the number of groups will be equal to the number of points
+  {
+    cluster->k = cluster->n;
+  }
+
+  cluster->groups = (Group *)calloc(cluster->n, sizeof(Group));
+  cluster->groups_a = cluster->n;
+  cluster->groups_u = 0;
+
+  // Put each point in a group
+  for (int i = 0; i < cluster->n; i++)
+  {
+    cluster->groups[i] = group_init();
+    group_setId(cluster->groups[i], i);
+    group_addPoint(cluster->groups[i], point_getId(cluster->points[i]));
+    cluster->groups_u++;
+  }
+
   int edgesSize = cluster->n - 1;
   int numberOfGroupSeparations = cluster->k - 1;
 
@@ -291,33 +306,9 @@ void cluster_identifyGroups(Cluster cluster)
     Group groupA = _exist_group_that_contains(cluster, pA_id);
     Group groupB = _exist_group_that_contains(cluster, pB_id);
 
-    if (groupA != NULL && groupB == NULL)
-    {
-      group_addPoint(groupA, pB_id);
-    }
-    else if (groupA == NULL && groupB != NULL)
-    {
-      group_addPoint(groupB, pA_id);
-    }
-    else if (groupA != NULL && groupB != NULL)
+    if (group_getId(groupA) != group_getId(groupB))
     {
       _merge_groups(groupA, groupB);
-    }
-    else if (groupA == NULL && groupB == NULL)
-    {
-      if (cluster->groups_u == cluster->groups_a)
-      {
-        cluster->groups_a += 1;
-        cluster->groups = (Group *)realloc(cluster->groups, cluster->groups_a * sizeof(Group));
-      }
-
-      // Add pA and pB to the group
-      cluster->groups[cluster->groups_u] = group_init();
-
-      group_addPoint(cluster->groups[cluster->groups_u], pA_id);
-      group_addPoint(cluster->groups[cluster->groups_u], pB_id);
-
-      cluster->groups_u++;
     }
   }
 }

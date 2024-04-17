@@ -8,6 +8,7 @@ struct group
   char **pointsIds; // The identifiers of the points in the group
   int points_u;     // Number of points in the group
   int points_a;     // Number of points allocated
+  int id;           // Group identifier
 };
 
 Group group_init()
@@ -25,7 +26,7 @@ void group_addPoint(Group group, char *pointId)
 {
   if (group->points_u == group->points_a)
   {
-    group->points_a *= 2;
+    group->points_a += 1;
     group->pointsIds = (char **)realloc(group->pointsIds, group->points_a * sizeof(char *));
   }
 
@@ -41,6 +42,16 @@ int group_getSize(Group group)
 void group_setSize(Group group, int size)
 {
   group->points_u = size;
+}
+
+int group_getId(Group group)
+{
+  return group->id;
+}
+
+void group_setId(Group group, int id)
+{
+  group->id = id;
 }
 
 void group_vanish(Group group)
@@ -92,4 +103,21 @@ void group_destroy(Group group)
 {
   free(group->pointsIds);
   free(group);
+}
+
+void _group_printAllAlloc(Group group)
+{
+  for (int i = 0; i < group->points_a; i++)
+  {
+    if (group->pointsIds[i] == NULL)
+    {
+      printf("NULL\n");
+    }
+    else
+    {
+      printf("%s\n", group->pointsIds[i]);
+    }
+  }
+
+  printf("-------------------\n");
 }
