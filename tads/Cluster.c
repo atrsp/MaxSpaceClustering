@@ -1,6 +1,7 @@
 #include "Cluster.h"
 #include "Point.h"
 #include "Distance.h"
+#include "Group.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -12,22 +13,33 @@
 
 struct cluster
 {
-  int k;                // Number of groups to be formed
-  int m;                // Dimension of the space
-  int n;                // Number of points
-  Point *points;        // Array of points
-  int points_alloc;     // Number of points allocated
-  Distance *distances;  // Array of distances
-  int distances_size;   // Size of distances array
+  int k;               // Number of groups to be formed
+  int m;               // Dimension of the space
+  int n;               // Number of points
+  Point *points;       // Array of points
+  int points_alloc;    // Number of points allocated
+  Distance *distances; // Array of distances
+  int distances_size;  // Size of distances array
 
-  int* sz;              // For each item, gives the number of objects in the tree rooted in that item
+  int *sz; // For each item, gives the number of objects in the tree rooted in that item
+
+  Group *groups;
+  int groups_a;
+  int groups_u;
+
+  Distance *edges; // Array of edges
 };
 
-Cluster cluster_init()
+Cluster cluster_init(int k)
 {
   Cluster cluster = (Cluster)calloc(1, sizeof(struct cluster));
   cluster->points_alloc = 2;
   cluster->points = (Point *)calloc(cluster->points_alloc, sizeof(Point));
+  cluster->k = k;
+
+  cluster->groups = (Group *)calloc(cluster->k, sizeof(Group));
+  cluster->groups_a = k;
+  cluster->groups_u = 0;
 
   return cluster;
 }
@@ -63,19 +75,17 @@ void cluster_read(Cluster cluster, char *filepath)
   {
     if (cluster->n == cluster->points_alloc)
     {
-      cluster->points_alloc *= 2;
+      cluster->points_alloc += 1;
       cluster->points = (Point *)realloc(cluster->points, cluster->points_alloc * sizeof(Point));
     }
 
     char *token = strtok(line, ","); // get the point id
     Point point = point_init(cluster->m, strlen(token) + 1);
-    // printf("ID: %s\n", token);
     point_setId(point, token);
 
     for (int i = 0; i < cluster->m; i++)
     {
       token = strtok(NULL, ",");
-      // printf("Coord: %s\n", token);
       point_setCoord(point, i, atof(token));
     }
 
@@ -87,14 +97,13 @@ void cluster_read(Cluster cluster, char *filepath)
   free(line);
   free(token);
   fclose(file);
+
+  // Alloc edges array
+  cluster->edges = (Distance *)calloc(cluster->n - 1, sizeof(Distance));
 }
 
 void _cluster_printPoints(Cluster cluster)
 {
-  // printf("\nquantity of points (n): %d;\n", cluster->n);
-  // printf("space size (m): %d;\n", cluster->m);
-  // printf("distances array size: %d.\n\n", cluster->distances_size);
-
   for (int i = 0; i < cluster->n; i++)
   {
     printf("Point %d\n", i);
@@ -107,65 +116,71 @@ void _cluster_printPoints(Cluster cluster)
 }
 
 void _cluster_printDistances(Cluster cluster)
-{ 
-  
+{
+
   for (int i = 0; i < cluster->distances_size; i++)
-    printf ("%d. DIST (pontos %s e %s): %lf\n", i, distance_getPointId(cluster->distances[i], 1), distance_getPointId(cluster->distances[i], 0), distance_getValue(cluster->distances[i]));
+    printf("%d. DIST (pontos %s e %s): %lf\n", i, distance_getPointId(cluster->distances[i], 1), distance_getPointId(cluster->distances[i], 0), distance_getValue(cluster->distances[i]));
 }
 
-
-void cluster_calcDistances(Cluster cluster) 
+void cluster_calcDistances(Cluster cluster)
 {
-  cluster->distances_size = (pow(cluster->n, 2) - cluster->n) / 2;   // Size of the lower triangle of a square matrix n sized;
+  cluster->distances_size = (pow(cluster->n, 2) - cluster->n) / 2; // Size of the lower triangle of a square matrix n sized;
   cluster->distances = distance_arrayInit(cluster->distances_size);
 
   int distancesIndex = 0;
-  for (int j = 0; j < cluster->n; j++) 
+  for (int j = 0; j < cluster->n - 1; j++)
   {
-    for (int k = j+1; k < cluster->n; k++) 
+    for (int k = j + 1; k < cluster->n; k++)
     {
       double distance = point_euclidianDistance(cluster->points[j], cluster->points[k], cluster->m);
       cluster->distances[distancesIndex] = distance_set(cluster->points[j], cluster->points[k], distance);
       distancesIndex++;
     }
   }
-  
 }
 
-void cluster_sortDistances(Cluster cluster) {
+void cluster_sortDistances(Cluster cluster)
+{
   qsort(cluster->distances, cluster->distances_size, sizeof(Distance), _distance_compare);
 }
 
-void _MST_init(Cluster cluster) {
-  cluster->sz = (int*)calloc(cluster->n, sizeof(int)); //init
+void _MST_init(Cluster cluster)
+{
+  cluster->sz = (int *)calloc(cluster->n, sizeof(int)); // init
 
-  for (int i = 0; i < cluster->n; i++) { //init
+  for (int i = 0; i < cluster->n; i++)
+  { // init
     point_setSet(cluster->points[i], i);
     cluster->sz[i] = 1;
   }
 }
 
-bool _MST_isConnected(Cluster cluster, int setA, int setB) {
-    return _MST_findRoot(cluster, setA) == _MST_findRoot(cluster, setB);
+bool _MST_isConnected(Cluster cluster, int setA, int setB)
+{
+  return _MST_findRoot(cluster, setA) == _MST_findRoot(cluster, setB);
 }
 
-int _MST_findRoot(Cluster cluster, int pointSet) {
-  while(pointSet != point_getSet(cluster->points[pointSet]))
+int _MST_findRoot(Cluster cluster, int pointSet)
+{
+  while (pointSet != point_getSet(cluster->points[pointSet]))
   {
     pointSet = point_getSet(cluster->points[pointSet]);
   }
-  
+
   return pointSet;
 }
 
-int _MST_findPreRoot(Cluster cluster, int idx, int pointSet, int root) {
+int _MST_findPreRoot(Cluster cluster, int idx, int pointSet, int root)
+{
   int preRoot = 0;
-  
-  if (pointSet == root) preRoot = idx; //"pre root" == itself's index in the cluster->points array
 
-  while(pointSet != root) //this while gets the "pre root" of the point, to create the cut in the tree afterwards
+  if (pointSet == root)
+    preRoot = idx; //"pre root" == itself's index in the cluster->points array
+
+  while (pointSet != root) // this while gets the "pre root" of the point, to create the cut in the tree afterwards
   {
-    if (point_getSet(cluster->points[pointSet]) == root) {
+    if (point_getSet(cluster->points[pointSet]) == root)
+    {
       preRoot = pointSet;
       break;
     }
@@ -175,28 +190,36 @@ int _MST_findPreRoot(Cluster cluster, int idx, int pointSet, int root) {
   return preRoot;
 }
 
-void _MST_union(Cluster cluster, int rootA, int rootB) {
+void _MST_union(Cluster cluster, int rootA, int rootB)
+{
 
-  if (cluster->sz[rootA] < cluster->sz[rootB]) {
+  if (cluster->sz[rootA] < cluster->sz[rootB])
+  {
     point_setSet(cluster->points[rootA], rootB);
     cluster->sz[rootB] += cluster->sz[rootA];
   }
-  else {
+  else
+  {
     point_setSet(cluster->points[rootB], rootA);
     cluster->sz[rootA] += cluster->sz[rootB];
   }
 }
 
-void _MST_cut(Cluster cluster, int pointSet) {
+void _MST_cut(Cluster cluster, int pointSet)
+{
   Point p = cluster->points[pointSet]; // point of preRoot to be cutted (pointSet)
-  point_setSet(p, pointSet); // sets the point to be cutted Set variable to itself, "cutting" the connection from it's previous root
+  point_setSet(p, pointSet);           // sets the point to be cutted Set variable to itself, "cutting" the connection from it's previous root
 }
 
-void cluster_kruskal(Cluster cluster) {
+void cluster_kruskal(Cluster cluster)
+{
 
   _MST_init(cluster);
 
-  for (int i = 0; i < cluster->distances_size; i++) {
+  int edgesIndex = 0;
+
+  for (int i = 0; i < cluster->distances_size; i++)
+  {
     Point pA = distance_getPoint(cluster->distances[i], PA);
     Point pB = distance_getPoint(cluster->distances[i], PB);
 
@@ -206,85 +229,157 @@ void cluster_kruskal(Cluster cluster) {
     int rootA = _MST_findRoot(cluster, setA);
     int rootB = _MST_findRoot(cluster, setB);
 
-    if (rootA != rootB) {
+    if (rootA != rootB)
+    {
       _MST_union(cluster, rootA, rootB);
+
+      // add edge to the edges array
+      cluster->edges[edgesIndex] = cluster->distances[i];
+      edgesIndex++;
+    }
+    else
+    {
+      // free distance
+      free(cluster->distances[i]);
     }
   }
-
-  printf("\n");
-  for (int i = 0; i < cluster->n; i++) {
-    int set = point_getSet(cluster->points[i]);
-    printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
-  }
-  printf("\n");
 }
 
-void cluster_identifyGroups(Cluster cluster, int k) {
-  int nCuts = 0;
-  int root = 0;
-  int preRootA = 0, preRootB = 0;
-  int nTreeA = 0, nTreeB = 0; // subtree sizes
+Group _exist_group_that_contains(Cluster cluster, char *pointId)
+{
+  for (int i = 0; i < cluster->groups_u; i++)
+  {
+    Group g = cluster->groups[i];
 
-  for (int i = cluster->distances_size-1; i >= 0; i--) {
-    if (nCuts == k-1) break; // for k=3 groups, we need 2 cuts in the tree, for example
+    if (g == NULL)
+      continue;
 
-    Point pA = distance_getPoint(cluster->distances[i], PA);
-    Point pB = distance_getPoint(cluster->distances[i], PB);
-
-    int setA = point_getSet(pA);
-    int setB = point_getSet(pB);
-    int idxA = point_getIdx(pA);
-    int idxB = point_getIdx(pB);
-
-    if (_MST_isConnected(cluster, setA, setB)) { // get the points from the distance array and check if they are connected
-      root = _MST_findRoot(cluster, setA);
-      preRootA = _MST_findPreRoot(cluster, idxA, setA, root); // get preRoot of pointB
-      preRootB = _MST_findPreRoot(cluster, idxB, setB, root); // get preRoot of pointB
-
-      printf("\ncut: pointA[%d]: %s; pointB[%d]: %s\n", idxA, point_getId(pA), idxB, point_getId(pB));
-      nTreeA = cluster->sz[preRootA];
-      nTreeB = cluster->sz[preRootB];
-
-      if (nTreeA < nTreeB) { // compares if pA tree branch (from sz array) is smaller than pB's
-        if (preRootB == root) {
-          _MST_cut(cluster, preRootA); // cuts connection from pointA to root
-        }
-        else _MST_cut(cluster, preRootB);
-      }
-      else if (nTreeA >= nTreeB) { // compares if pA tree branch (from sz array) is bigger than pB's
-        if (preRootA == root) {
-          _MST_cut(cluster, preRootB); // cuts connection from pointB to root
-        }
-        else _MST_cut(cluster, preRootA);
-      }
-
-      nCuts+=1;
+    for (int j = 0; j < group_getSize(g); j++)
+    {
+      if (strcmp(group_getPointId(g, j), pointId) == 0)
+        return g;
     }
-    else continue; // points are already not connected -> group already identified
   }
 
-  // for (int i = 0; i < cluster->n; i++) {
-  //   printf("sz[%d] = %d ", i, cluster->sz[i]);
-  // }
-  // printf("\n");
+  return NULL;
+}
 
-  printf("\n");
-  for (int i = 0; i < cluster->n; i++) {
-    int set = point_getSet(cluster->points[i]);
-    printf("%s[%s] ", point_getId(cluster->points[i]), point_getId(cluster->points[set]));
+void _merge_groups(Group groupA, Group groupB)
+{
+  for (int i = 0; i < group_getSize(groupB); i++)
+  {
+    group_addPoint(groupA, group_getPointId(groupB, i));
   }
-  printf("\n");
 
+  group_vanish(groupB);
+}
+
+void cluster_identifyGroups(Cluster cluster)
+{
+  int edgesSize = cluster->n - 1;
+  int numberOfGroupSeparations = cluster->k - 1;
+
+  for (int i = 0; i < (edgesSize - numberOfGroupSeparations); i++)
+  {
+    Distance edge = cluster->edges[i];
+    Point pA = distance_getPoint(edge, PA);
+    Point pB = distance_getPoint(edge, PB);
+
+    char *pA_id = point_getId(pA);
+    char *pB_id = point_getId(pB);
+
+    Group groupA = _exist_group_that_contains(cluster, pA_id);
+    Group groupB = _exist_group_that_contains(cluster, pB_id);
+
+    if (groupA != NULL && groupB == NULL)
+    {
+      group_addPoint(groupA, pB_id);
+    }
+    else if (groupA == NULL && groupB != NULL)
+    {
+      group_addPoint(groupB, pA_id);
+    }
+    else if (groupA != NULL && groupB != NULL)
+    {
+      _merge_groups(groupA, groupB);
+    }
+    else if (groupA == NULL && groupB == NULL)
+    {
+      if (cluster->groups_u == cluster->groups_a)
+      {
+        cluster->groups_a += 1;
+        cluster->groups = (Group *)realloc(cluster->groups, cluster->groups_a * sizeof(Group));
+      }
+
+      // Add pA and pB to the group
+      cluster->groups[cluster->groups_u] = group_init();
+
+      group_addPoint(cluster->groups[cluster->groups_u], pA_id);
+      group_addPoint(cluster->groups[cluster->groups_u], pB_id);
+
+      cluster->groups_u++;
+    }
+  }
+}
+
+void cluster_generateResult(Cluster cluster, char *filename)
+{
+  FILE *file = fopen(filename, "w");
+
+  if (file == NULL)
+  {
+    printf("Error: File not found.\n");
+    exit(1);
+  }
+
+  // get the real groups array
+  Group real[cluster->k];
+
+  int idx = 0;
+  for (int i = 0; i < cluster->groups_u; i++)
+  {
+    if (group_getSize(cluster->groups[i]) > 0)
+    {
+      real[idx] = cluster->groups[i];
+      idx++;
+    }
+  }
+
+  for (int i = 0; i < cluster->k; i++)
+  {
+    group_sort(real[i]);
+  }
+
+  // order groups by first point id
+  qsort(real, cluster->k, sizeof(Group), _group_compare);
+
+  for (int i = 0; i < cluster->k; i++)
+  {
+    group_printOnFile(real[i], file);
+  }
+
+  fclose(file);
 }
 
 void cluster_destroy(Cluster cluster)
 {
-  distance_destroy(cluster->distances, cluster->distances_size);
-  
+  free(cluster->distances);
+
+  for (int i = 0; i < cluster->n - 1; i++)
+  {
+    free(cluster->edges[i]);
+  }
+
+  free(cluster->edges);
+
   for (int i = 0; i < cluster->n; i++)
     point_destroy(cluster->points[i]);
-  
+
+  for (int i = 0; i < cluster->groups_u; i++)
+    group_destroy(cluster->groups[i]);
+
   free(cluster->points);
+  free(cluster->groups);
   free(cluster->sz);
   free(cluster);
 }
