@@ -6,69 +6,65 @@
 
 int main(int argc, char *argv[])
 {
-  clock_t start, end, head, tail;
-  double cpu_time_used;
+  // clock_t start, end, head, tail;
+  // double cpu_time_used;
 
-  head = clock();
+  // head = clock();
   Cluster cluster = cluster_init(atoi(argv[2]));
 
-  start = clock();
+  // start = clock();
   cluster_read(cluster, argv[1]);
-  end = clock();
+  // end = clock();
 
-  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-  printf("cluster_read() time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  // printf("cluster_read() time: %.3lf seconds\n", cpu_time_used);
 
-  start = clock();
+  // start = clock();
   cluster_calcDistances(cluster);
-  end = clock();
+  // end = clock();
 
-  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-  printf("cluster_calcDistances() time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  // printf("cluster_calcDistances() time: %.3lf seconds\n", cpu_time_used);
 
-  start = clock();
+  // start = clock();
   cluster_sortDistances(cluster);
-  end = clock();
+  // end = clock();
 
-  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-  printf("cluster_sortDistances() time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  // printf("cluster_sortDistances() time: %.3lf seconds\n", cpu_time_used);
 
-  start = clock();
+  // start = clock();
   cluster_kruskal(cluster);
-  end = clock();
+  // end = clock();
 
-  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-  printf("cluster_kruskal() time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  // printf("cluster_kruskal() time: %.3lf seconds\n", cpu_time_used);
 
-  start = clock();
+  // start = clock();
   cluster_identifyGroups(cluster);
-  end = clock();
+  // end = clock();
 
-  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-  printf("cluster_identifyGroups() time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  // printf("cluster_identifyGroups() time: %.3lf seconds\n", cpu_time_used);
 
-  start = clock();
+  // start = clock();
   cluster_generateResult(cluster, argv[3]);
-  end = clock();
+  // end = clock();
 
-  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-  printf("cluster_generateResult() time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  // printf("cluster_generateResult() time: %.3lf seconds\n", cpu_time_used);
 
-  // Proves that the points were read correctly
-  // _cluster_printPoints(cluster);
-  // _cluster_printDistances(cluster);
-
-  start = clock();
+  // start = clock();
   cluster_destroy(cluster);
-  end = clock();
+  // end = clock();
 
-  cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-  printf("cluster_destroy() time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
+  // printf("cluster_destroy() time: %.3lf seconds\n", cpu_time_used);
 
-  tail = clock();
+  // tail = clock();
 
-  cpu_time_used = ((double)(tail - head)) / CLOCKS_PER_SEC;
-  printf("total time: %.2f seconds\n", cpu_time_used);
+  // cpu_time_used = ((double)(tail - head)) / CLOCKS_PER_SEC;
+  // printf("total time: %.3lf seconds\n", cpu_time_used);
 
   return 0;
 }

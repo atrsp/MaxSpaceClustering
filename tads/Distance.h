@@ -56,16 +56,6 @@ Point distance_getPoint(Distance d, int whichPoint);
  * @param b Pointer to the second Distance object.
  * @return Negative value if the first distance is smaller, positive value if the first distance is larger, 0 if equal.
  */
-int _distance_compare(const void *a, const void *b);
-
-/**
- * Deallocates memory for an array of Distance objects.
- *
- * @param d The array of Distance objects.
- * @param size The size of the array.
- *
- * @deprecated
- */
-void distance_destroy(Distance *d, int size);
+int distance_compare(const void *a, const void *b);
 
 #endif

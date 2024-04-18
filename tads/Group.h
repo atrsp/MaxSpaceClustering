@@ -82,7 +82,7 @@ void group_sort(Group group);
  * @param b The second group.
  * @return int The comparison result.
  */
-int _group_compare(const void *a, const void *b);
+int group_compare(const void *a, const void *b);
 
 /**
  * @brief Prints a group on a file.
@@ -98,7 +98,5 @@ void group_printOnFile(Group group, FILE *file);
  * @param group The group.
  */
 void group_destroy(Group group);
-
-void _group_printAllAlloc(Group group);
 
 #endif

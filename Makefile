@@ -11,48 +11,10 @@ all: main.c tads/Cluster.c tads/Cluster.h tads/Point.c tads/Point.h tads/Distanc
 	@gcc -o trab1 $(COMPILED)/main.o $(COMPILED)/Cluster.o $(COMPILED)/Point.o $(COMPILED)/Distance.o $(COMPILED)/Group.o -lm
 
 run:
-	./trab1 in-exemplos/5.txt 10 out_exemplos/out5a.txt
+	./trab1 in-exemplos/5.txt 10 saida5.txt
 
-run_spec:
-	./trab1 in-exemplos/spec.txt 10 saida.txt
-
-run_unordered_spec:
-	./trab1 in-exemplos/unordered_spec.txt 3 saida.txt
-
-run_30k:
-	./trab1 in-exemplos/30k_5dim.txt 10 saida.txt
-
-valgrind_30k:
-	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/30k_5dim.txt 10 saida.txt
-
-valgrind_spec:
-	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/spec.txt 4 saida.txt
-
-K = 10
-
-valgrind1:
-	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/1.txt 10 casos_out/1/k=10.txt
-
-valgrind2:
-	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/2.txt $(K) casos_out/2/k=$(K).txt
-
-valgrind3:
-	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/3.txt $(K) casos_out/3/k=$(K).txt
-
-valgrind4:
-	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/4.txt $(K) casos_out/4/k=$(K).txt
-
-run_4:
-	./trab1 in-exemplos/4.txt $(K) casos_out/4/k=$(K).txt
-
-valgrind5:
-	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/5.txt 10 out_exemplos/out5a.txt
-
-run_5:
-	./trab1 in-exemplos/5.txt $(K) casos_out/5/k=$(K).txt
-
-run_10k_5dim:
-	./trab1 10k_5dim.txt 100 saida.txt
+valgrind:
+	valgrind --leak-check=full --show-leak-kinds=all ./trab1 in-exemplos/5.txt 10 saida.txt
 
 clean:
 	@rm -f $(COMPILED)/*.o
