@@ -50,7 +50,7 @@ Point distance_getPoint(Distance d, int whichPoint)
   return d->pB;
 }
 
-int _distance_compare(const void *a, const void *b)
+int distance_compare(const void *a, const void *b)
 {
   const Distance distanceA = *(const Distance *)a;
   const Distance distanceB = *(const Distance *)b;
@@ -61,13 +61,4 @@ int _distance_compare(const void *a, const void *b)
   if (distanceA->distance > distanceB->distance)
     return 1;
   return 0; // Distances are equal
-}
-
-// @deprecated
-void distance_destroy(Distance *d, int size)
-{
-  for (int i = 0; i < size; i++)
-    free(d[i]);
-
-  free(d);
 }

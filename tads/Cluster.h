@@ -28,23 +28,7 @@ Cluster cluster_init(int k);
 void cluster_read(Cluster cluster, char *filepath);
 
 /**
- * Prints the points of a cluster.
- *
- * Uses printf() from stdio to print the identifier and coordinates of each point in the cluster.
- *
- * @param cluster The cluster to be printed.
- */
-void _cluster_printPoints(Cluster cluster);
-
-/**
- * Prints the distances between points in the cluster.
- *
- * @param cluster The cluster containing the distances to be printed.
- */
-void _cluster_printDistances(Cluster cluster);
-
-/**
- * Calculates the distances between points in the cluster and stores them in the cluster's distances array.
+ * Calculates the distances between all pairs of points in the cluster and stores them in the cluster's distances array.
  *
  * @param cluster The cluster for which distances are to be calculated.
  */
@@ -65,16 +49,6 @@ void cluster_sortDistances(Cluster cluster);
 void _MST_init(Cluster cluster);
 
 /**
- * Checks if two point sets in the cluster are connected.
- *
- * @param cluster The cluster containing the sets.
- * @param setA The index of the first set.
- * @param setB The index of the second set.
- * @return true if setA and setB are connected, false otherwise.
- */
-bool _MST_isConnected(Cluster cluster, int setA, int setB);
-
-/**
  * Finds the root of the set containing the specified point.
  *
  * @param cluster The cluster containing the point sets.
@@ -84,39 +58,20 @@ bool _MST_isConnected(Cluster cluster, int setA, int setB);
 int _MST_findRoot(Cluster cluster, int pointSet);
 
 /**
- * Finds the "pre root" of a point in a MST.
+ * Combines two trees in the cluster.
  *
- * @param cluster   The cluster containing the points.
- * @param idx       The index of the point to find the "pre root" for.
- * @param pointSet  The set of the point (immediate parent).
- * @param root      The root of the set.
- * @return          The index of the "pre root" of the point.
+ * @param cluster The cluster containing the roots to be combined.
+ * @param rootA The index of the first root.
+ * @param rootB The index of the second root.
  */
-int _MST_findPreRoot(Cluster cluster, int idx, int pointSet, int root);
-
-/**
- * Combines two point sets in the cluster.
- *
- * @param cluster The cluster containing the sets to be combined.
- * @param setA The index of the first set.
- * @param setB The index of the second set.
- */
-void _MST_union(Cluster cluster, int setA, int setB);
-
-/**
- * Cuts the connection of a point with its previous root.
- *
- * @param cluster   The cluster containing the points.
- * @param pointSet  The set of the point to be cut.
- */
-void _MST_cut(Cluster cluster, int pointSet);
+void _MST_union(Cluster cluster, int rootA, int rootB);
 
 /**
  * Performs Kruskal's algorithm on the cluster to construct a minimum spanning tree.
  *
  * @param cluster The cluster for which Kruskal's algorithm is performed.
  */
-void cluster_kruskal();
+void cluster_kruskal(Cluster cluster);
 
 /**
  * Identifies groups within the cluster by performing cuts on the minimum spanning tree (MST).

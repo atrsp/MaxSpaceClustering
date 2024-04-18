@@ -9,7 +9,6 @@ struct point
   char *id;       // Identifier of the point
   double *coords; // Coordinates of the point
   int set;        // index of immediate parent
-  int idx;        // index of the point int the points array
 };
 
 Point point_init(int m, int idInitialLength)
@@ -50,16 +49,6 @@ int point_getSet(Point p)
 void point_setCoord(Point point, int i, double coord)
 {
   point->coords[i] = coord;
-}
-
-void point_setIdx(Point point, int idx)
-{
-  point->idx = idx;
-}
-
-int point_getIdx(Point point)
-{
-  return point->idx;
 }
 
 double point_euclidianDistance(Point pA, Point pB, int dimension)

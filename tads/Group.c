@@ -79,7 +79,7 @@ void group_sort(Group group)
   qsort(group->pointsIds, group->points_u, sizeof(char *), _compare_id);
 }
 
-int _group_compare(const void *a, const void *b)
+int group_compare(const void *a, const void *b)
 {
   return strcmp((*(Group *)a)->pointsIds[0], (*(Group *)b)->pointsIds[0]);
 }
@@ -103,21 +103,4 @@ void group_destroy(Group group)
 {
   free(group->pointsIds);
   free(group);
-}
-
-void _group_printAllAlloc(Group group)
-{
-  for (int i = 0; i < group->points_a; i++)
-  {
-    if (group->pointsIds[i] == NULL)
-    {
-      printf("NULL\n");
-    }
-    else
-    {
-      printf("%s\n", group->pointsIds[i]);
-    }
-  }
-
-  printf("-------------------\n");
 }

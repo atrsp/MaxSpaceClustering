@@ -13,21 +13,22 @@
 
 struct cluster
 {
-  int k;               // Number of groups to be formed
-  int m;               // Dimension of the space
-  int n;               // Number of points
-  Point *points;       // Array of points
-  int points_alloc;    // Number of points allocated
+  int k; // Number of groups to be formed
+  int m; // Dimension of the space
+  int n; // Number of points
+
+  Point *points;    // Array of points
+  int points_alloc; // Number of points allocated
+
   Distance *distances; // Array of distances
   int distances_size;  // Size of distances array
 
-  int *sz; // For each item, gives the number of objects in the tree rooted in that item
+  Distance *edges; // Array of connected edges
+  int *sz;         // For each item, gives the number of objects in the tree rooted in that item (used in kruskal's weighted quick union)
 
-  Group *groups;
-  int groups_a;
-  int groups_u;
-
-  Distance *edges; // Array of edges
+  Group *groups; // Array of groups
+  int groups_a;  // Number of groups allocated
+  int groups_u;  // Number of groups used in the memory
 };
 
 Cluster cluster_init(int k)
@@ -79,6 +80,7 @@ void cluster_read(Cluster cluster, char *filepath)
     Point point = point_init(cluster->m, strlen(token) + 1);
     point_setId(point, token);
 
+    // get the point coordinates
     for (int i = 0; i < cluster->m; i++)
     {
       token = strtok(NULL, ",");
@@ -86,7 +88,6 @@ void cluster_read(Cluster cluster, char *filepath)
     }
 
     cluster->points[cluster->n] = point;
-    point_setIdx(point, cluster->n);
     cluster->n++;
   }
 
@@ -94,33 +95,13 @@ void cluster_read(Cluster cluster, char *filepath)
   free(token);
   fclose(file);
 
-  // Alloc edges array
+  // Alloc edges array (minimum size to connect all points (n-1))
   cluster->edges = (Distance *)calloc(cluster->n - 1, sizeof(Distance));
-}
-
-void _cluster_printPoints(Cluster cluster)
-{
-  for (int i = 0; i < cluster->n; i++)
-  {
-    printf("Point %d\n", i);
-    printf("ID: %s\n", point_getId(cluster->points[i]));
-    for (int j = 0; j < cluster->m; j++)
-    {
-      printf("Coord %d: %f\n", j, point_getCoord(cluster->points[i], j));
-    }
-  }
-}
-
-void _cluster_printDistances(Cluster cluster)
-{
-
-  for (int i = 0; i < cluster->distances_size; i++)
-    printf("%d. DIST (pontos %s e %s): %lf\n", i, distance_getPointId(cluster->distances[i], 1), distance_getPointId(cluster->distances[i], 0), distance_getValue(cluster->distances[i]));
 }
 
 void cluster_calcDistances(Cluster cluster)
 {
-  cluster->distances_size = ((cluster->n * cluster->n) - cluster->n) / 2; // Size of the lower triangle of a square matrix n sized;
+  cluster->distances_size = ((cluster->n * cluster->n) - cluster->n) / 2; // Size of the lower triangle of a square matrix sized n;
   cluster->distances = distance_arrayInit(cluster->distances_size);
 
   int distancesIndex = 0;
@@ -137,23 +118,18 @@ void cluster_calcDistances(Cluster cluster)
 
 void cluster_sortDistances(Cluster cluster)
 {
-  qsort(cluster->distances, cluster->distances_size, sizeof(Distance), _distance_compare);
+  qsort(cluster->distances, cluster->distances_size, sizeof(Distance), distance_compare);
 }
 
-void _MST_init(Cluster cluster)
+void _MST_init(Cluster cluster) // weighted quick union implementation
 {
-  cluster->sz = (int *)calloc(cluster->n, sizeof(int)); // init
+  cluster->sz = (int *)calloc(cluster->n, sizeof(int));
 
   for (int i = 0; i < cluster->n; i++)
-  { // init
+  {
     point_setSet(cluster->points[i], i);
     cluster->sz[i] = 1;
   }
-}
-
-bool _MST_isConnected(Cluster cluster, int setA, int setB)
-{
-  return _MST_findRoot(cluster, setA) == _MST_findRoot(cluster, setB);
 }
 
 int _MST_findRoot(Cluster cluster, int pointSet)
@@ -166,29 +142,8 @@ int _MST_findRoot(Cluster cluster, int pointSet)
   return pointSet;
 }
 
-int _MST_findPreRoot(Cluster cluster, int idx, int pointSet, int root)
-{
-  int preRoot = 0;
-
-  if (pointSet == root)
-    preRoot = idx; //"pre root" == itself's index in the cluster->points array
-
-  while (pointSet != root) // this while gets the "pre root" of the point, to create the cut in the tree afterwards
-  {
-    if (point_getSet(cluster->points[pointSet]) == root)
-    {
-      preRoot = pointSet;
-      break;
-    }
-    pointSet = point_getSet(cluster->points[pointSet]);
-  }
-
-  return preRoot;
-}
-
 void _MST_union(Cluster cluster, int rootA, int rootB)
 {
-
   if (cluster->sz[rootA] < cluster->sz[rootB])
   {
     point_setSet(cluster->points[rootA], rootB);
@@ -201,16 +156,10 @@ void _MST_union(Cluster cluster, int rootA, int rootB)
   }
 }
 
-void _MST_cut(Cluster cluster, int pointSet)
-{
-  Point p = cluster->points[pointSet]; // point of preRoot to be cutted (pointSet)
-  point_setSet(p, pointSet);           // sets the point to be cutted Set variable to itself, "cutting" the connection from it's previous root
-}
-
 void cluster_kruskal(Cluster cluster)
 {
 
-  _MST_init(cluster);
+  _MST_init(cluster); // generates a forest of points
 
   int edgesIndex = 0;
 
@@ -229,13 +178,13 @@ void cluster_kruskal(Cluster cluster)
     {
       _MST_union(cluster, rootA, rootB);
 
-      // add edge to the edges array
+      // add edge (current distance) to the edges array
       cluster->edges[edgesIndex] = cluster->distances[i];
       edgesIndex++;
     }
     else
     {
-      // free distance
+      // free non-edge distances
       free(cluster->distances[i]);
     }
   }
@@ -243,31 +192,45 @@ void cluster_kruskal(Cluster cluster)
 
 Group _exist_group_that_contains(Cluster cluster, char *pointId)
 {
-  for (int i = 0; i < cluster->groups_u; i++)
+  for (int i = 0; i < cluster->groups_u; i++) // iterate over all groups
   {
     Group g = cluster->groups[i];
 
     if (g == NULL)
       continue;
 
-    for (int j = 0; j < group_getSize(g); j++)
+    for (int j = 0; j < group_getSize(g); j++) // search point in the current group
     {
-      if (strcmp(group_getPointId(g, j), pointId) == 0)
-        return g;
+      if (strcmp(group_getPointId(g, j), pointId) == 0) // compares if point Ids are equal
+        return g;                                       // return the group that contains the point
     }
   }
 
-  return NULL;
+  return NULL; // point is not in a group
 }
 
 void _merge_groups(Group groupA, Group groupB)
 {
-  for (int i = 0; i < group_getSize(groupB); i++)
+  Group greater = NULL;
+  Group smaller = NULL;
+
+  if (group_getSize(groupA) > group_getSize(groupB))
   {
-    group_addPoint(groupA, group_getPointId(groupB, i));
+    greater = groupA;
+    smaller = groupB;
+  }
+  else
+  {
+    greater = groupB;
+    smaller = groupA;
   }
 
-  group_vanish(groupB);
+  for (int i = 0; i < group_getSize(smaller); i++) // iterate over groupB
+  {
+    group_addPoint(greater, group_getPointId(smaller, i)); // copies pointsIds from groupB to groupA
+  }
+
+  group_vanish(smaller); // empties groupB
 }
 
 void cluster_identifyGroups(Cluster cluster)
@@ -282,7 +245,7 @@ void cluster_identifyGroups(Cluster cluster)
   cluster->groups_a = cluster->n;
   cluster->groups_u = 0;
 
-  // Put each point in a group
+  // Put each point in a group (sets a forest of groups, each one containing 1 point)
   for (int i = 0; i < cluster->n; i++)
   {
     cluster->groups[i] = group_init();
@@ -292,7 +255,7 @@ void cluster_identifyGroups(Cluster cluster)
   }
 
   int edgesSize = cluster->n - 1;
-  int numberOfGroupSeparations = cluster->k - 1;
+  int numberOfGroupSeparations = cluster->k - 1; // ignores the k-1 greatest distances
 
   for (int i = 0; i < (edgesSize - numberOfGroupSeparations); i++)
   {
@@ -319,19 +282,19 @@ void cluster_generateResult(Cluster cluster, char *filename)
 
   if (file == NULL)
   {
-    printf("Error: File not found.\n");
+    // printf("Error: File not found.\n");
     exit(1);
   }
 
-  // get the real groups array
+  // get the real groups array, filtering empty groups in the groups array
   Group real[cluster->k];
 
   int idx = 0;
-  for (int i = 0; i < cluster->groups_u; i++)
+  for (int i = 0; i < cluster->groups_u; i++) // iterates through all groups previously created
   {
-    if (group_getSize(cluster->groups[i]) > 0)
+    if (group_getSize(cluster->groups[i]) > 0) // if groups is not empty
     {
-      real[idx] = cluster->groups[i];
+      real[idx] = cluster->groups[i]; // add group to real groups array
       idx++;
     }
   }
@@ -342,7 +305,7 @@ void cluster_generateResult(Cluster cluster, char *filename)
   }
 
   // order groups by first point id
-  qsort(real, cluster->k, sizeof(Group), _group_compare);
+  qsort(real, cluster->k, sizeof(Group), group_compare);
 
   for (int i = 0; i < cluster->k; i++)
   {

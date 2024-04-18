@@ -41,7 +41,7 @@ void point_setId(Point point, char *id);
 
 /**
  * Sets the index of the set (immediate parent) that the point belongs to.
- * 
+ *
  * @param p The Point object for which to set the index of the set.
  * @param set The index of the set that the point belongs to.
  */
@@ -49,7 +49,7 @@ void point_setSet(Point p, int set);
 
 /**
  * Retrieves the index of the set (immediate parent) that the point belongs to.
- * 
+ *
  * @param p The Point object for which to retrieve the index of the set.
  * @return The index of the set that the point belongs to.
  */
@@ -65,22 +65,6 @@ int point_getSet(Point p);
 void point_setCoord(Point point, int i, double coord);
 
 /**
- * Sets the index of a point equivalent in a points array.
- *
- * @param point The point to set the index for.
- * @param idx   The index value to set.
- */
-void point_setIdx(Point point, int idx);
-
-/**
- * Retrieves the index of a point equivalent in a points array.
- *
- * @param point The point to retrieve the index from.
- * @return      The index of the point.
- */
-int point_getIdx(Point point);
-
-/**
  * Calculates the Euclidian Distance between two points.
  *
  * @param pA First point.
@@ -88,7 +72,7 @@ int point_getIdx(Point point);
  * @param dimension The dimension from the points.
  * @return The calculated Euclidian Distance.
  */
-double point_euclidianDistance (Point pA, Point pB, int dimension);
+double point_euclidianDistance(Point pA, Point pB, int dimension);
 
 /**
  * Destroys a point.
